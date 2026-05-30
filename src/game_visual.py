@@ -6,6 +6,7 @@ from .pieces.piece import Piece
 class GameVisual():
     def __init__(self, board: list[list[Piece]]):
         self.manager = arcade.gui.UIManager()
+        self.manager.enable()
         self.manager._pixelated = True
         
         board_image = arcade.gui.UIImage(

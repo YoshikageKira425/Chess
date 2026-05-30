@@ -26,6 +26,12 @@ class Piece():
             width=36,
             height=48
         )
+
+        
+    def setButtonCallback(self, callback: callable):
+        @self.pieceButton.event("on_click")
+        def on_click(*args, **kwargs):
+            callback()
         
     def setPosition(self, row: int, col: int):
         x = 175 + (col * 60) + 18
