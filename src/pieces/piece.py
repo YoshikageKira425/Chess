@@ -19,6 +19,7 @@ textures = {
 
 class Piece():
     def __init__(self, piece: str):
+        self.color = piece[0]
         self.pieceButton = arcade.gui.UITextureButton(
             texture=textures[piece.lower()],
             x=0,

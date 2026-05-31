@@ -1,13 +1,16 @@
 import arcade
-from .game_visual import GameVisual
-from .pieces.piece import Piece
+from src.game_visual import GameVisual
+from src.game_ui import GameUI
+from src.pieces.piece import Piece
 
 
 class GameView(arcade.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(background_color=arcade.color.GRAY)
         
         self.selected = None
+        
+        self.turn = True
 
         self.board = [
             [Piece("bR"), Piece("bN"), Piece("bB"), Piece("bQ"), Piece("bK"), Piece("bB"), Piece("bN"), Piece("bR")],
@@ -22,6 +25,7 @@ class GameView(arcade.View):
         self.setupBoard(self.board)
         
         self.visual = GameVisual(self.board)
+        self.ui = GameUI()
 
     def setupBoard(self, board: list[list[Piece]]):
         for row in range(8):
@@ -46,6 +50,14 @@ class GameView(arcade.View):
 
         piece = self.board[fromRow][fromCol]
         
+        if piece.color == "w" and not self.turn:
+            self.selected = None
+            return
+        
+        if piece.color == "b" and self.turn:
+            self.selected = None
+            return
+        
         captured = self.board[toRow][toCol]
         if captured is not None:
             self.visual.manager.remove(captured.pieceButton)
@@ -58,6 +70,9 @@ class GameView(arcade.View):
         piece.setButtonCallback(lambda r=toRow, c=toCol: self.onPieceClicked(r, c))
 
         self.selected = None
+        
+        self.turn = not self.turn
+        self.ui.setTurn(self.turn)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.selected is not None:
@@ -71,4 +86,6 @@ class GameView(arcade.View):
 
     def on_draw(self):
         self.clear()
+        
         self.visual.draw()
+        self.ui.draw()
