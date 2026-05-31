@@ -16,27 +16,25 @@ textures = {
     "bk": arcade.load_texture("assets/sprites/black_pieces/king_black.png"),
 }
 
-
 class Piece():
     def __init__(self, piece: str):
         self.color = piece[0]
-        self.pieceButton = arcade.gui.UITextureButton(
+        self.piece_button = arcade.gui.UITextureButton(
             texture=textures[piece.lower()],
             x=0,
             y=0,
             width=36,
             height=48
         )
-
         
-    def setButtonCallback(self, callback: callable):
-        @self.pieceButton.event("on_click")
+    def set_button_callback(self, callback: callable):
+        @self.piece_button.event("on_click")
         def on_click(*args, **kwargs):
             callback()
         
-    def setPosition(self, row: int, col: int):
+    def set_position(self, row: int, col: int):
         x = 175 + (col * 60) + 18
         y = 600 - (110 + (row * 60) - 24)
         
-        self.pieceButton.center_x = x
-        self.pieceButton.center_y = y
+        self.piece_button.center_x = x
+        self.piece_button.center_y = y

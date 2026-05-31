@@ -22,33 +22,33 @@ class GameView(arcade.View):
             [Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP")],
             [Piece("wR"), Piece("wN"), Piece("wB"), Piece("wQ"), Piece("wK"), Piece("wB"), Piece("wN"), Piece("wR")],
         ]
-        self.setupBoard(self.board)
+        self.setup_board(self.board)
         
         self.visual = GameVisual(self.board)
         self.ui = GameUI()
 
-    def setupBoard(self, board: list[list[Piece]]):
+    def setup_board(self, board: list[list[Piece]]):
         for row in range(8):
             for col in range(8):
                 piece = board[row][col]
                 if piece is not None:
-                    piece.setButtonCallback(lambda row=row, col=col: self.onPieceClicked(row, col))
+                    piece.set_button_callback(lambda row=row, col=col: self.on_piece_clicked(row, col))
                     
-    def onPieceClicked(self, row: int, col: int):
+    def on_piece_clicked(self, row: int, col: int):
         if self.selected is None:
             self.selected = (row, col)
         else:
-            self.movePiece(self.selected, (row, col))
+            self.move_piece(self.selected, (row, col))
 
-    def movePiece(self, fromPos: tuple, toPos: tuple):
-        fromRow, fromCol = fromPos
-        toRow, toCol = toPos
+    def move_piece(self, fromPos: tuple, toPos: tuple):
+        from_row, from_col = fromPos
+        to_row, to_col = toPos
         
-        if fromRow == toRow and fromCol == toCol:
+        if from_row == to_row and from_col == to_col:
             self.selected = None
             return
 
-        piece = self.board[fromRow][fromCol]
+        piece = self.board[from_row][from_col]
         
         if piece.color == "w" and not self.turn:
             self.selected = None
@@ -58,21 +58,21 @@ class GameView(arcade.View):
             self.selected = None
             return
         
-        captured = self.board[toRow][toCol]
+        captured = self.board[to_row][to_col]
         if captured is not None:
-            self.visual.manager.remove(captured.pieceButton)
+            self.visual.remove_piece(captured)
 
-        self.board[toRow][toCol] = piece
-        self.board[fromRow][fromCol] = None
+        self.board[to_row][to_col] = piece
+        self.board[from_row][from_col] = None
 
-        piece.setPosition(toRow, toCol)
+        piece.set_position(to_row, to_col)
 
-        piece.setButtonCallback(lambda r=toRow, c=toCol: self.onPieceClicked(r, c))
+        piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
 
         self.selected = None
         
         self.turn = not self.turn
-        self.ui.setTurn(self.turn)
+        self.ui.set_turn(self.turn)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.selected is not None:
@@ -82,7 +82,7 @@ class GameView(arcade.View):
             if 0 <= row <= 7 and 0 <= col <= 7:
                 to_piece = self.board[row][col]
                 if to_piece is None:
-                    self.movePiece(self.selected, (row, col))
+                    self.move_piece(self.selected, (row, col))
 
     def on_draw(self):
         self.clear()

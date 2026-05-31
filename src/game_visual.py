@@ -5,9 +5,9 @@ from .pieces.piece import Piece
 
 class GameVisual():
     def __init__(self, board: list[list[Piece]]):
-        self.manager = arcade.gui.UIManager()
-        self.manager.enable()
-        self.manager._pixelated = True
+        self._manager = arcade.gui.UIManager()
+        self._manager.enable()
+        self._manager._pixelated = True
         
         board_image = arcade.gui.UIImage(
             texture=arcade.load_texture("assets/sprites/board/board_with_border_01.png"),
@@ -16,19 +16,22 @@ class GameVisual():
             width=528,
             height=528
         )
-        self.manager.add(board_image)
+        self._manager.add(board_image)
         
-        self.setBoard(board)
+        self.set_board(board)
 
-    def setBoard(self, board: list[list[Piece]]):
+    def set_board(self, board: list[list[Piece]]):
         self.board = board
 
         for row in range(8):
             for col in range(8):
                 piece = board[row][col]
                 if piece is not None:
-                    piece.setPosition(row, col) 
-                    self.manager.add(piece.pieceButton)
+                    piece.set_position(row, col) 
+                    self._manager.add(piece.piece_button)
+                    
+    def remove_piece(self, piece: Piece):
+        self._manager.remove(piece.piece_button)
 
     def draw(self):
-        self.manager.draw()
+        self._manager.draw()

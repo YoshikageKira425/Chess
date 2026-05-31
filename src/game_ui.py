@@ -3,28 +3,28 @@ import arcade.gui
 
 class GameUI:
     def __init__(self):
-        self.manager = arcade.gui.UIManager()
-        self.manager.enable()
-        self.manager._pixelated = True
+        self._manager = arcade.gui.UIManager()
+        self._manager.enable()
+        self._manager._pixelated = True
         
-        self.whiteTurnTexture = arcade.load_texture("assets/sprites/white_pieces/pawn_white.png")
-        self.blackTurnTexture = arcade.load_texture("assets/sprites/black_pieces/pawn_black.png")
+        self.white_turn_texture = arcade.load_texture("assets/sprites/white_pieces/pawn_white.png")
+        self.black_turn_texture = arcade.load_texture("assets/sprites/black_pieces/pawn_black.png")
         
-        self.turnIndicator = arcade.gui.UIImage(
-            texture=self.whiteTurnTexture,
+        self.turn_indicator = arcade.gui.UIImage(
+            texture=self.white_turn_texture,
             x=20,
             y=500,
             width=54,
             height=72
         )
         
-        self.manager.add(self.turnIndicator)
+        self._manager.add(self.turn_indicator)
         
-    def setTurn(self, turn: bool):
+    def set_turn(self, turn: bool):
         if turn:
-            self.turnIndicator.texture = self.whiteTurnTexture
+            self.turn_indicator.texture = self.white_turn_texture
         else:
-            self.turnIndicator.texture = self.blackTurnTexture
+            self.turn_indicator.texture = self.black_turn_texture
 
     def draw(self):
-        self.manager.draw()
+        self._manager.draw()
