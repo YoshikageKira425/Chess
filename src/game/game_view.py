@@ -1,7 +1,7 @@
 import arcade
-from src.game_visual import GameVisual
-from src.game_ui import GameUI
-from src.pieces.piece import Piece
+from .game_visual import GameVisual
+from .game_ui import GameUI
+from .pieces.piece import Piece
 
 
 class GameView(arcade.View):
