@@ -4,6 +4,7 @@ from src.ui.game_ui import GameUI
 from src.pieces.piece import Piece
 from src.pieces.pawn import Pawn
 from src.pieces.knight import Knight
+from src.pieces.rook import Rook
 
 
 class GameView(arcade.View):
@@ -15,14 +16,14 @@ class GameView(arcade.View):
         self.turn = True
 
         self.board = [
-            [Piece("bR"), Knight("bN"), Piece("bB"), Piece("bQ"), Piece("bK"), Piece("bB"), Knight("bN"), Piece("bR")],
+            [Rook("bR"), Knight("bN"), Piece("bB"), Piece("bQ"), Piece("bK"), Piece("bB"), Knight("bN"), Rook("bR")],
             [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"),Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
-            [Piece("wR"), Knight("wN"), Piece("wB"), Piece("wQ"), Piece("wK"), Piece("wB"), Knight("wN"), Piece("wR")],
+            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), None],
+            [Rook("wR"), Knight("wN"), Piece("wB"), Piece("wQ"), Piece("wK"), Piece("wB"), Knight("wN"), Rook("wR")],
         ]
         self.setup_board(self.board)
         
@@ -75,8 +76,8 @@ class GameView(arcade.View):
 
         self.selected = None
         
-        self.turn = not self.turn
-        self.ui.set_turn(self.turn)
+        # self.turn = not self.turn
+        # self.ui.set_turn(self.turn)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.selected is not None:
