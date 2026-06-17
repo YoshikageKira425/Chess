@@ -31,6 +31,9 @@ class Piece():
         @self.piece_button.event("on_click")
         def on_click(*args, **kwargs):
             callback()
+    
+    def valid_move(self, board: list[list[Piece]]) -> bool:
+        return True
         
     def set_position(self, row: int, col: int):
         x = 175 + (col * 60) + 18

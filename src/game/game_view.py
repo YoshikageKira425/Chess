@@ -58,6 +58,10 @@ class GameView(arcade.View):
             self.selected = None
             return
         
+        if not piece.valid_move():
+            self.selected = None
+            return
+        
         captured = self.board[to_row][to_col]
         if captured is not None:
             self.visual.remove_piece(captured)
