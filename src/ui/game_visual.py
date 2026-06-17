@@ -1,6 +1,6 @@
 import arcade
 import arcade.gui
-from .pieces.piece import Piece
+from ..pieces.piece import Piece
 
 
 class GameVisual():

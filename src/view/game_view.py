@@ -1,7 +1,7 @@
 import arcade
-from .game_visual import GameVisual
-from .game_ui import GameUI
-from .pieces.piece import Piece
+from src.ui.game_visual import GameVisual
+from src.ui.game_ui import GameUI
+from src.pieces.piece import Piece
 
 
 class GameView(arcade.View):
@@ -58,7 +58,7 @@ class GameView(arcade.View):
             self.selected = None
             return
         
-        if not piece.valid_move():
+        if not piece.valid_move(self.board):
             self.selected = None
             return
         

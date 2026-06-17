@@ -1,5 +1,5 @@
 import arcade
-from src.game.game_view import GameView
+from src.view.game_view import GameView
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
