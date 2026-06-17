@@ -2,6 +2,7 @@ import arcade
 from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.pieces.piece import Piece
+from src.pieces.pawn import Pawn
 
 
 class GameView(arcade.View):
@@ -14,12 +15,12 @@ class GameView(arcade.View):
 
         self.board = [
             [Piece("bR"), Piece("bN"), Piece("bB"), Piece("bQ"), Piece("bK"), Piece("bB"), Piece("bN"), Piece("bR")],
-            [Piece("bP"), Piece("bP"), Piece("bP"), Piece("bP"),Piece("bP"), Piece("bP"), Piece("bP"), Piece("bP")],
+            [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"),Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP"), Piece("wP")],
+            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
             [Piece("wR"), Piece("wN"), Piece("wB"), Piece("wQ"), Piece("wK"), Piece("wB"), Piece("wN"), Piece("wR")],
         ]
         self.setup_board(self.board)
@@ -40,14 +41,10 @@ class GameView(arcade.View):
         else:
             self.move_piece(self.selected, (row, col))
 
-    def move_piece(self, fromPos: tuple, toPos: tuple):
-        from_row, from_col = fromPos
-        to_row, to_col = toPos
+    def move_piece(self, from_pos: tuple, to_pos: tuple):
+        from_row, from_col = from_pos
+        to_row, to_col = to_pos
         
-        if from_row == to_row and from_col == to_col:
-            self.selected = None
-            return
-
         piece = self.board[from_row][from_col]
         
         if piece.color == "w" and not self.turn:
@@ -58,7 +55,7 @@ class GameView(arcade.View):
             self.selected = None
             return
         
-        if not piece.valid_move(self.board):
+        if not piece.valid_move(self.board, from_pos, to_pos):
             self.selected = None
             return
         
@@ -72,6 +69,8 @@ class GameView(arcade.View):
         piece.set_position(to_row, to_col)
 
         piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
+        
+        piece.pieced_moved()
 
         self.selected = None
         

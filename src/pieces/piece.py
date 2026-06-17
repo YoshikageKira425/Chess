@@ -32,8 +32,11 @@ class Piece():
         def on_click(*args, **kwargs):
             callback()
     
-    def valid_move(self, board: list[list[Piece]]) -> bool:
+    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple) -> bool:
         return True
+    
+    def pieced_moved(self):
+        pass
         
     def set_position(self, row: int, col: int):
         x = 175 + (col * 60) + 18
