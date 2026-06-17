@@ -3,6 +3,7 @@ from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.pieces.piece import Piece
 from src.pieces.pawn import Pawn
+from src.pieces.knight import Knight
 
 
 class GameView(arcade.View):
@@ -14,14 +15,14 @@ class GameView(arcade.View):
         self.turn = True
 
         self.board = [
-            [Piece("bR"), Piece("bN"), Piece("bB"), Piece("bQ"), Piece("bK"), Piece("bB"), Piece("bN"), Piece("bR")],
+            [Piece("bR"), Knight("bN"), Piece("bB"), Piece("bQ"), Piece("bK"), Piece("bB"), Knight("bN"), Piece("bR")],
             [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"),Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
-            [Piece("wR"), Piece("wN"), Piece("wB"), Piece("wQ"), Piece("wK"), Piece("wB"), Piece("wN"), Piece("wR")],
+            [Piece("wR"), Knight("wN"), Piece("wB"), Piece("wQ"), Piece("wK"), Piece("wB"), Knight("wN"), Piece("wR")],
         ]
         self.setup_board(self.board)
         
