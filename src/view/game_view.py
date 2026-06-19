@@ -6,6 +6,7 @@ from src.pieces.pawn import Pawn
 from src.pieces.knight import Knight
 from src.pieces.rook import Rook
 from src.pieces.bishop import Bishop
+from src.pieces.queen import Queen
 
 
 class GameView(arcade.View):
@@ -17,14 +18,14 @@ class GameView(arcade.View):
         self.turn = True
 
         self.board = [
-            [Rook("bR"), Knight("bN"), Bishop("bB"), Piece("bQ"), Piece("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
+            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), Piece("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
             [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"),Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
-            [Rook("wR"), Knight("wN"), Bishop("wB"), Piece("wQ"), Piece("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
+            [Pawn("wP"), Pawn("wP"), Pawn("wP"), None, Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
+            [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), Piece("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
         ]
         self.setup_board(self.board)
         
@@ -38,7 +39,7 @@ class GameView(arcade.View):
                 if piece is not None:
                     piece.set_button_callback(lambda row=row, col=col: self.on_piece_clicked(row, col))
                     
-    def on_piece_clicked(self, row: int, col: int)
+    def on_piece_clicked(self, row: int, col: int):
         if self.selected is None:
             self.selected = (row, col)
         else:
@@ -77,8 +78,8 @@ class GameView(arcade.View):
 
         self.selected = None
         
-        self.turn = not self.turn
-        self.ui.set_turn(self.turn)
+        # self.turn = not self.turn
+        # self.ui.set_turn(self.turn)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.selected is not None:
