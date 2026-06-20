@@ -7,6 +7,7 @@ from src.pieces.knight import Knight
 from src.pieces.rook import Rook
 from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
+from ..constants import HIGHLIGHT_CAPTURE, HIGHLIGHT_MOVE, HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
 
 
 class GameView(arcade.View):
@@ -24,7 +25,7 @@ class GameView(arcade.View):
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn("wP"), Pawn("wP"), Pawn("wP"), None, Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
+            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
             [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), Piece("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
         ]
         self.setup_board(self.board)
@@ -42,8 +43,10 @@ class GameView(arcade.View):
     def on_piece_clicked(self, row: int, col: int):
         if self.selected is None:
             self.selected = (row, col)
+            self._update_highlights()
         else:
             self.move_piece(self.selected, (row, col))
+            self.stop_moving()
 
     def move_piece(self, from_pos: tuple, to_pos: tuple):
         from_row, from_col = from_pos
@@ -51,16 +54,16 @@ class GameView(arcade.View):
         
         piece = self.board[from_row][from_col]
         
+        if not piece:
+            return
+        
         if piece.color == "w" and not self.turn:
-            self.selected = None
             return
         
         if piece.color == "b" and self.turn:
-            self.selected = None
             return
         
         if not piece.valid_move(self.board, from_pos, to_pos):
-            self.selected = None
             return
         
         captured = self.board[to_row][to_col]
@@ -76,15 +79,25 @@ class GameView(arcade.View):
         
         piece.pieced_moved()
 
+        self.turn = not self.turn
+        self.ui.set_turn(self.turn)
+        
+    def stop_moving(self):
+        self.visual.clear_highlights()
         self.selected = None
         
-        # self.turn = not self.turn
-        # self.ui.set_turn(self.turn)
+    def _update_highlights(self):
+        row, col = self.selected
+        highlights = [(row, col, HIGHLIGHT_SELECTED)]  # selected square
+
+        # Highlights for valid moves and show capture moves
+
+        self.visual.set_highlights(highlights)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.selected is not None:
-            col = round((x - 175 - 18) / 60)
-            row = round((600 - 110 + 24 - y) / 60)
+            col = round((x - BOARD_OFFSET_X - 18) / 60)
+            row = round((600 - BOARD_OFFSET_Y + 24 - y) / 60)
 
             if 0 <= row <= 7 and 0 <= col <= 7:
                 to_piece = self.board[row][col]
