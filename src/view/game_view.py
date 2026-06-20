@@ -25,7 +25,7 @@ class GameView(arcade.View):
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
+            [Pawn("wP"), Pawn("wP"), None, None, None, Pawn("wP"), Pawn("wP"), Pawn("wP")],
             [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), Piece("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
         ]
         self.setup_board(self.board)
@@ -41,13 +41,21 @@ class GameView(arcade.View):
                     piece.set_button_callback(lambda row=row, col=col: self.on_piece_clicked(row, col))
                     
     def on_piece_clicked(self, row: int, col: int):
-        if self.selected is None:
-            self.selected = (row, col)
-            self._update_highlights()
-        else:
+        if self.selected:
             self.move_piece(self.selected, (row, col))
             self.stop_moving()
-
+            return
+        
+        piece = self.board[row][col]
+        if piece.color == "w" and not self.turn:
+            return
+        
+        if piece.color == "b" and self.turn:
+            return
+        
+        self.selected = (row, col)
+        self._update_highlights()
+            
     def move_piece(self, from_pos: tuple, to_pos: tuple):
         from_row, from_col = from_pos
         to_row, to_col = to_pos
@@ -55,12 +63,6 @@ class GameView(arcade.View):
         piece = self.board[from_row][from_col]
         
         if not piece:
-            return
-        
-        if piece.color == "w" and not self.turn:
-            return
-        
-        if piece.color == "b" and self.turn:
             return
         
         if not piece.valid_move(self.board, from_pos, to_pos):
@@ -103,6 +105,7 @@ class GameView(arcade.View):
                 to_piece = self.board[row][col]
                 if to_piece is None:
                     self.move_piece(self.selected, (row, col))
+                    self.stop_moving()
 
     def on_draw(self):
         self.clear()

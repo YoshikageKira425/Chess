@@ -1,4 +1,5 @@
 from .piece import Piece
+from ..constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
 
 class Bishop(Piece):
     def __init__(self, piece):
@@ -27,3 +28,34 @@ class Bishop(Piece):
             return False
 
         return True
+    
+    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple) -> list[tuple]:
+        from_row, from_col = from_pos
+        highlights = []
+
+        directions = [
+            (1, 1),   # right-top
+            (-1, -1),  # right-down
+            (-1, 1),   # left-top
+            (1, -1),  # left-down
+        ]
+
+        for dr, dc in directions:
+            row = from_row + dr
+            col = from_col + dc
+
+            while 0 <= row < 8 and 0 <= col < 8:
+                piece = board[row][col]
+
+                if piece is None:
+                    highlights.append((row, col, HIGHLIGHT_MOVE))
+                elif piece.color != self.color:
+                    highlights.append((row, col, HIGHLIGHT_CAPTURE))
+                    break
+                else:
+                    break
+
+                row += dr
+                col += dc
+
+        return highlights

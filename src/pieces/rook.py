@@ -1,4 +1,5 @@
 from .piece import Piece
+from ..constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
 
 class Rook(Piece):
     def __init__(self, piece):
@@ -21,6 +22,7 @@ class Rook(Piece):
         while (cur_row, cur_col) != (to_row, to_col):
             if board[cur_row][cur_col] is not None:
                 return False
+            
             cur_row += row_step
             cur_col += col_step
 
@@ -29,3 +31,34 @@ class Rook(Piece):
             return False
 
         return True
+    
+    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple) -> list[tuple]:
+        from_row, from_col = from_pos
+        highlights = []
+
+        directions = [
+            (1, 0),   # down
+            (-1, 0),  # up
+            (0, 1),   # right
+            (0, -1),  # left
+        ]
+
+        for dr, dc in directions:
+            row = from_row + dr
+            col = from_col + dc
+
+            while 0 <= row < 8 and 0 <= col < 8:
+                piece = board[row][col]
+
+                if piece is None:
+                    highlights.append((row, col, HIGHLIGHT_MOVE))
+                elif piece.color != self.color:
+                    highlights.append((row, col, HIGHLIGHT_CAPTURE))
+                    break
+                else:
+                    break
+
+                row += dr
+                col += dc
+
+        return highlights
