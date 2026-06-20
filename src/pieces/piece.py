@@ -35,6 +35,9 @@ class Piece():
     def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple) -> bool:
         return True
     
+    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple) -> list[tuple]:
+        return []
+    
     def pieced_moved(self):
         pass
         

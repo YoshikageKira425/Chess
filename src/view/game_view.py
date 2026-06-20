@@ -7,7 +7,7 @@ from src.pieces.knight import Knight
 from src.pieces.rook import Rook
 from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
-from ..constants import HIGHLIGHT_CAPTURE, HIGHLIGHT_MOVE, HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
+from ..constants import HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
 
 
 class GameView(arcade.View):
@@ -90,7 +90,7 @@ class GameView(arcade.View):
         row, col = self.selected
         highlights = [(row, col, HIGHLIGHT_SELECTED)]  # selected square
 
-        # Highlights for valid moves and show capture moves
+        highlights.extend(self.board[row][col].move_hightlight(self.board, self.selected))
 
         self.visual.set_highlights(highlights)
 
