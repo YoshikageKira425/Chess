@@ -47,6 +47,10 @@ class GameView(arcade.View):
 
         captured = self.board.move(from_pos, to_pos)
 
+        if self.board.is_king_threatened(self.turn):
+            self.board.undo()
+            return
+
         if captured is not None:
             self.visual.remove_piece(captured)
 

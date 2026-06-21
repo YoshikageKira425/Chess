@@ -5,6 +5,7 @@ from src.pieces.rook import Rook
 from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
 from src.pieces.king import King
+from src.action import Action
 
 
 class Board:
@@ -19,6 +20,11 @@ class Board:
             [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
             [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), King("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
         ]
+        
+        self.white_king = self.grid[7][4]
+        self.black_king = self.grid[0][4]
+        
+        self.actions: list[Action] = []
 
     def get(self, row: int, col: int) -> Piece | None:
         return self.grid[row][col]
@@ -29,10 +35,19 @@ class Board:
         to_row, to_col = to_pos
 
         piece = self.grid[from_row][from_col]
+        piece.set_indexes(to_row, to_col)
+        
         captured = self.grid[to_row][to_col]
 
         self.grid[to_row][to_col] = piece
         self.grid[from_row][from_col] = None
+        
+        self.actions.append(Action(
+            from_pos=from_pos,
+            to_pos=to_pos,
+            piece=piece,
+            captured=captured
+        ))
 
         return captured
 
@@ -44,6 +59,37 @@ class Board:
             return False
 
         return piece.valid_move(self.grid, from_pos, to_pos)
+    
+    def undo(self) -> Action | None:
+        if not self.actions:
+            return None
+        
+        action = self.actions.pop()
+        from_row, from_col = action.from_pos
+        to_row, to_col = action.to_pos
+
+        self.grid[from_row][from_col] = action.piece
+        action.piece.set_indexes(from_row, from_col)
+        
+        self.grid[to_row][to_col] = action.captured
+        
+        return action
+
+    def is_king_threatened(self, turn: bool) -> bool:
+        enemy_color = "b" if turn else "w"
+        king = self.white_king if turn else self.black_king
+        
+        for row in range(8):
+            for col in range(8):
+                piece = self.get(row, col)
+                
+                if piece is None:
+                    continue
+                
+                if enemy_color == piece.color and piece.valid_move(self.grid, (row, col), king.get_indexes()):
+                    return True
+        
+        return False
 
     def is_within_bounds(self, row: int, col: int) -> bool:
         return 0 <= row <= 7 and 0 <= col <= 7
