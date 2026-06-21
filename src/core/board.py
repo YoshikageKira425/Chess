@@ -4,19 +4,20 @@ from src.pieces.knight import Knight
 from src.pieces.rook import Rook
 from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
+from src.pieces.king import King
 
 
 class Board:
     def __init__(self):
         self.grid = [
-            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), Piece("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
+            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
             [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn("wP"), Pawn("wP"), None, None, None, Pawn("wP"), Pawn("wP"), Pawn("wP")],
-            [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), Piece("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
+            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
+            [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), King("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
         ]
 
     def get(self, row: int, col: int) -> Piece | None:
