@@ -60,6 +60,12 @@ class GameView(arcade.View):
         piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
         piece.pieced_moved()
 
+        if self.board.is_checkmate(not self.turn):
+            print(f"WIN {"white" if self.turn else "black"}")
+        else:
+            self.switch_turn()
+        
+    def switch_turn(self):
         self.turn = not self.turn
         self.ui.set_turn(self.turn)
 
