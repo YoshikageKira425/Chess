@@ -15,13 +15,14 @@ class GameView(arcade.View):
         self.selected = None
         self.turn = True
         self.is_pause = False
+        self.is_win = False
 
         self.board = Board()
         self.setup_board()
 
         self.visual = GameVisual(self.board.grid)
         self.ui = GameUI()
-        self.ui.set_up_ui(self.unpause, self.restart)
+        self.ui.set_up_ui_buttons(self.unpause, self.restart)
 
     def setup_board(self):
         for row in range(8):
@@ -31,7 +32,7 @@ class GameView(arcade.View):
                     piece.set_button_callback(lambda r=row, c=col: self.on_piece_clicked(r, c))
 
     def on_piece_clicked(self, row: int, col: int):
-        if self.is_pause:
+        if self.is_pause or self.is_win:
             return
         
         if self.selected:
@@ -68,7 +69,7 @@ class GameView(arcade.View):
         piece.pieced_moved()
 
         if self.board.is_checkmate(not self.turn):
-            print(f"WIN {"white" if self.turn else "black"}")
+            self.win()
         else:
             self.switch_turn()
         
@@ -90,10 +91,12 @@ class GameView(arcade.View):
     def restart(self):
         self.turn = True
         self.ui.set_turn(self.turn)
-        
+        self.ui.remove_win()
+        self.is_win = False
+
         self.unpause()
         self.board.setup_board()
-        
+
         self.setup_board()
         self.visual.set_board(self.board.grid)
         
@@ -102,18 +105,23 @@ class GameView(arcade.View):
         self.ui.unpause()
 
     def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.TAB:
+        if symbol == arcade.key.TAB and not self.is_win:
             self.is_pause = not self.is_pause
-            
+
             if self.is_pause:
                 self.ui.pause()
             else:
                 self.ui.unpause()
-            
+
         return super().on_key_press(symbol, modifiers)
 
+    def win(self):
+        self.is_win = True
+        self.stop_moving()
+        self.ui.win(self.turn)
+
     def on_mouse_press(self, x, y, button, modifiers):
-        if self.is_pause:
+        if self.is_pause or self.is_win:
             return
 
         if self.selected is not None:

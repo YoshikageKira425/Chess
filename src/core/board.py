@@ -98,37 +98,25 @@ class Board:
         if not self.is_king_threatened(turn):
             return False
 
-        king = self.white_king if turn else self.black_king
-        base_row, base_col = king.get_indexes()
+        friendly_color = "w" if turn else "b"
 
-        move_directions = [
-            (1, 0), (1, 1), (1, -1),
-            (0, 1), (0, -1),
-            (-1, 0), (-1, 1), (-1, -1)
-        ]
+        for row in range(8):
+            for col in range(8):
+                piece = self.grid[row][col]
+                if piece is None or piece.color != friendly_color:
+                    continue
 
-        for dr, dc in move_directions:
-            to_row, to_col = base_row + dr, base_col + dc
+                for to_row in range(8):
+                    for to_col in range(8):
+                        if not self.is_valid_move((row, col), (to_row, to_col)):
+                            continue
 
-            if not self.is_within_bounds(to_row, to_col):
-                continue
+                        self.move((row, col), (to_row, to_col))
+                        still_threatened = self.is_king_threatened(turn)
+                        self.undo()
 
-            target = self.grid[to_row][to_col]
-            if target is not None and target.color == king.color:
-                continue
-
-            self.grid[to_row][to_col] = king
-            self.grid[base_row][base_col] = None
-            king.row, king.col = to_row, to_col
-
-            threatened = self.is_king_threatened(turn)
-            
-            self.grid[base_row][base_col] = king
-            self.grid[to_row][to_col] = target
-            king.row, king.col = base_row, base_col
-
-            if not threatened:
-                return False
+                        if not still_threatened:
+                            return False
 
         return True
 
