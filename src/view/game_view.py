@@ -9,9 +9,12 @@ from ..constants import HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
 class GameView(arcade.View):
     def __init__(self):
         super().__init__(background_color=arcade.color.GRAY)
+        
+        arcade.load_font("assets/font/ARCADECLASSIC.ttf")
 
         self.selected = None
         self.turn = True
+        self.is_pause = False
 
         self.board = Board()
         self.setup_board()
@@ -27,6 +30,9 @@ class GameView(arcade.View):
                     piece.set_button_callback(lambda r=row, c=col: self.on_piece_clicked(r, c))
 
     def on_piece_clicked(self, row: int, col: int):
+        if self.is_pause:
+            return
+        
         if self.selected:
             self.move_piece(self.selected, (row, col))
             self.stop_moving()
@@ -80,7 +86,21 @@ class GameView(arcade.View):
         
         self.visual.set_highlights(highlights)
 
+    def on_key_press(self, symbol, modifiers):
+        if symbol == arcade.key.TAB:
+            self.is_pause = not self.is_pause
+            
+            if self.is_pause:
+                self.ui.pause()
+            else:
+                self.ui.unpause()
+            
+        return super().on_key_press(symbol, modifiers)
+
     def on_mouse_press(self, x, y, button, modifiers):
+        if self.is_pause:
+            return
+
         if self.selected is not None:
             col = round((x - BOARD_OFFSET_X - 18) / 60)
             row = round((600 - BOARD_OFFSET_Y + 24 - y) / 60)
