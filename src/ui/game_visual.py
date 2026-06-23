@@ -19,10 +19,13 @@ class GameVisual():
             height=528
         )
         self._manager.add(board_image)
+        self._pieces_holder = arcade.gui.UIWidget()
+        self._manager.add(self._pieces_holder)
         
         self.set_board(board)
 
     def set_board(self, board: list[list[Piece]]):
+        self._pieces_holder.clear()
         self.board = board
 
         for row in range(8):
@@ -30,7 +33,7 @@ class GameVisual():
                 piece = board[row][col]
                 if piece is not None:
                     piece.set_position(row, col) 
-                    self._manager.add(piece.piece_button)
+                    self._pieces_holder.add(piece.piece_button)
                     
     def remove_piece(self, piece: Piece):
         self._manager.remove(piece.piece_button)

@@ -10,6 +10,9 @@ from src.action import Action
 
 class Board:
     def __init__(self):
+        self.setup_board()
+        
+    def setup_board(self):
         self.grid = [
             [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
             [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],

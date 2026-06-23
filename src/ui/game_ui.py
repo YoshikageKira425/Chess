@@ -45,13 +45,27 @@ class GameUI:
         
         self._pause_widget.add(arcade.gui.UILabel(text="PAUSED", font_size=60, font_name="ArcadeClassic", y=520, x=40))
         
-        self._pause_widget.add(arcade.gui.UIFlatButton(text="RESUME", y=420, x=40, width=225, style=button_style))
+        self._resume_button = arcade.gui.UIFlatButton(text="RESUME", y=420, x=40, width=225, style=button_style)
         
-        self._pause_widget.add(arcade.gui.UIFlatButton(text="RESTART", y=360, x=40, width=250, style=button_style))
+        self._pause_widget.add(self._resume_button)
+        
+        self._restart_button = arcade.gui.UIFlatButton(text="RESTART", y=360, x=40, width=250, style=button_style)
+        
+        self._pause_widget.add(self._restart_button)
         
         self._pause_widget.add(arcade.gui.UIFlatButton(text="MAIN MENU", y=300, x=40, width=285, style=button_style))
         
         self._manager.add(self._turn_indicator)
+        
+    def set_up_ui(self, resume_func: callable, restart_func: callable):
+        def on_resume(event):
+            resume_func()
+            
+        def on_restart(event):
+            restart_func()
+
+        self._restart_button.on_click = on_restart
+        self._resume_button.on_click = on_resume
         
     def set_turn(self, turn: bool):
         if turn:

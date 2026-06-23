@@ -21,6 +21,7 @@ class GameView(arcade.View):
 
         self.visual = GameVisual(self.board.grid)
         self.ui = GameUI()
+        self.ui.set_up_ui(self.unpause, self.restart)
 
     def setup_board(self):
         for row in range(8):
@@ -85,6 +86,20 @@ class GameView(arcade.View):
         highlights.extend(self.board.get(row, col).move_hightlight(self.board.grid, self.selected))
         
         self.visual.set_highlights(highlights)
+        
+    def restart(self):
+        self.turn = True
+        self.ui.set_turn(self.turn)
+        
+        self.unpause()
+        self.board.setup_board()
+        
+        self.setup_board()
+        self.visual.set_board(self.board.grid)
+        
+    def unpause(self):
+        self.is_pause = False
+        self.ui.unpause()
 
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.TAB:
