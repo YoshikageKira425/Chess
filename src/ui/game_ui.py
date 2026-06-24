@@ -114,16 +114,20 @@ class GameUI:
         except Exception:
             pass
     
-    def set_up_ui_buttons(self, resume_func: callable, restart_func: callable):
+    def set_up_ui_buttons(self, resume_func: callable, restart_func: callable, main_menu_func: callable):
         def on_resume(event):
             resume_func()
 
         def on_restart(event):
             restart_func()
+            
+        def on_main_menu(event):
+            main_menu_func()
 
         self._restart_button.on_click = on_restart
         self._resume_button.on_click = on_resume
         self._win_restart_button.on_click = on_restart
+        self._main_menu_button.on_click = on_main_menu
         
     def _set_up_promotion_ui(self):
         self._promotion_widget = arcade.gui.UIWidget()

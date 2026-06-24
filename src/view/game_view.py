@@ -2,15 +2,12 @@ import arcade
 from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.core.board import Board
-from src.pieces.piece import Piece
 from ..constants import HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
 
 
 class GameView(arcade.View):
     def __init__(self):
         super().__init__(background_color=arcade.color.GRAY)
-        
-        arcade.load_font("assets/font/ARCADECLASSIC.ttf")
 
         self.selected = None
         self.turn = True
@@ -22,7 +19,7 @@ class GameView(arcade.View):
 
         self.visual = GameVisual(self.board.grid)
         self.ui = GameUI()
-        self.ui.set_up_ui_buttons(self.unpause, self.restart)
+        self.ui.set_up_ui_buttons(self.unpause, self.restart, self.main_menu)
 
     def setup_board(self):
         for row in range(8):
@@ -128,7 +125,12 @@ class GameView(arcade.View):
 
         self.setup_board()
         self.visual.set_board(self.board.grid)
-        
+    
+    def main_menu(self):
+        from src.view.main_menu_view import MainMenuView
+
+        self.window.show_view(MainMenuView())
+    
     def unpause(self):
         self.is_pause = False
         self.ui.unpause()
