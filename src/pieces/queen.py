@@ -16,7 +16,7 @@ class Queen(Piece):
 
         return True
     
-    def _bishop_behavior(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
+    def _bishop_behavior(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple) -> bool:
         from_row, from_col = from_pos
         to_row, to_col = to_pos
 
@@ -58,7 +58,7 @@ class Queen(Piece):
             
         return True
     
-    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple) -> list[tuple]:
+    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         from_row, from_col = from_pos
         highlights = []
 

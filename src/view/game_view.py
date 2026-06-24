@@ -67,15 +67,41 @@ class GameView(arcade.View):
         piece.set_position(to_row, to_col)
         piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
         piece.pieced_moved()
-
-        if self.board.is_checkmate(not self.turn):
-            self.win()
-        else:
-            self.switch_turn()
         
-    def switch_turn(self):
-        self.turn = not self.turn
-        self.ui.set_turn(self.turn)
+        if self.board.is_promotion():
+            self.ui.show_promotion(self._on_promotion)
+            return
+
+        self.finish_turn()
+    
+    def _on_promotion(self, piece_type: str):
+        last = self.board.last_action()
+        to_row, to_col = last.to_pos
+
+        old_piece = self.board.get(to_row, to_col)
+        self.visual.remove_piece(old_piece)
+
+        self.board.promote(piece_type)
+
+        new_piece = self.board.get(to_row, to_col)
+        self.visual.add_piece(new_piece, to_row, to_col)
+        new_piece.set_button_callback(
+            lambda r=to_row, c=to_col: self.on_piece_clicked(r, c)
+        )
+
+        self.finish_turn()    
+    
+    def finish_turn(self):
+        if self.board.is_checkmate(not self.turn):
+            self._win()
+        else:
+            self.turn = not self.turn
+            self.ui.set_turn(self.turn)
+        
+    def _win(self):
+        self.is_win = True
+        self.stop_moving()
+        self.ui.win(self.turn)
 
     def stop_moving(self):
         self.visual.clear_highlights()
@@ -117,11 +143,6 @@ class GameView(arcade.View):
                 self.ui.unpause()
 
         return super().on_key_press(symbol, modifiers)
-
-    def win(self):
-        self.is_win = True
-        self.stop_moving()
-        self.ui.win(self.turn)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.is_pause or self.is_win:

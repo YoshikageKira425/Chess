@@ -47,7 +47,7 @@ class Board:
             en_passant_captured = self.grid[from_row][to_col]
             self.grid[from_row][to_col] = None
             captured = en_passant_captured
-
+        
         self.grid[to_row][to_col] = piece
         self.grid[from_row][from_col] = None
         
@@ -70,6 +70,30 @@ class Board:
         last = self.last_action()
 
         return piece.valid_move(self.grid, from_pos, to_pos, last)
+    
+    def is_promotion(self) -> bool:
+        last = self.last_action()
+        if last is None:
+            return False
+
+        piece = last.piece
+        return isinstance(piece, Pawn) and (
+            (piece.color == "w" and piece.row == 0) or
+            (piece.color == "b" and piece.row == 7)
+        )
+
+    def promote(self, piece_type: str):
+        """Replace the pawn with the chosen piece. Call after is_promotion()."""
+        last = self.last_action()
+        row, col = last.to_pos
+        color = last.piece.color
+
+        classes = {"Q": Queen, "R": Rook, "B": Bishop, "N": Knight}
+        new_piece = classes[piece_type](f"{color}{piece_type}")
+        new_piece.set_indexes(row, col)
+
+        self.grid[row][col] = new_piece
+        last.piece = new_piece
     
     def undo(self) -> Action | None:
         if not self.actions:

@@ -35,6 +35,10 @@ class GameVisual():
                     piece.set_position(row, col) 
                     self._pieces_holder.add(piece.piece_button)
                     
+    def add_piece(self, piece: Piece, row: int, col: int):
+        piece.set_position(row, col)
+        self._pieces_holder.add(piece.piece_button)            
+        
     def remove_piece(self, piece: Piece):
         self._pieces_holder.remove(piece.piece_button)
         
