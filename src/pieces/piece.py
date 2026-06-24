@@ -35,10 +35,10 @@ class Piece():
         def on_click(*args, **kwargs):
             callback()
     
-    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple) -> bool:
+    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
         return True
     
-    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple) -> list[tuple]:
+    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         return []
     
     def pieced_moved(self):

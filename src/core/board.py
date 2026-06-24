@@ -13,7 +13,7 @@ class Board:
         self.setup_board()
         
     def setup_board(self):
-        self.grid = [
+        self.grid: list[list[Piece]] = [
             [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
             [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
             [None, None, None, None, None, None, None, None],
@@ -41,6 +41,12 @@ class Board:
         piece.set_indexes(to_row, to_col)
         
         captured = self.grid[to_row][to_col]
+        
+        en_passant_captured = None
+        if isinstance(piece, Pawn) and captured is None and from_col != to_col:
+            en_passant_captured = self.grid[from_row][to_col]
+            self.grid[from_row][to_col] = None
+            captured = en_passant_captured
 
         self.grid[to_row][to_col] = piece
         self.grid[from_row][from_col] = None
@@ -60,8 +66,10 @@ class Board:
 
         if not piece:
             return False
+        
+        last = self.last_action()
 
-        return piece.valid_move(self.grid, from_pos, to_pos)
+        return piece.valid_move(self.grid, from_pos, to_pos, last)
     
     def undo(self) -> Action | None:
         if not self.actions:
@@ -122,3 +130,6 @@ class Board:
 
     def is_within_bounds(self, row: int, col: int) -> bool:
         return 0 <= row <= 7 and 0 <= col <= 7
+    
+    def last_action(self) -> Action | None:
+        return self.actions[-1] if self.actions else None

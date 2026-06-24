@@ -84,7 +84,10 @@ class GameView(arcade.View):
     def _update_highlights(self):
         row, col = self.selected
         highlights = [(row, col, HIGHLIGHT_SELECTED)]
-        highlights.extend(self.board.get(row, col).move_hightlight(self.board.grid, self.selected))
+        
+        last_action = self.board.last_action()
+        
+        highlights.extend(self.board.get(row, col).move_hightlight(self.board.grid, self.selected, last_action))
         
         self.visual.set_highlights(highlights)
         

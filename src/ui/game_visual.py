@@ -36,7 +36,7 @@ class GameVisual():
                     self._pieces_holder.add(piece.piece_button)
                     
     def remove_piece(self, piece: Piece):
-        self._manager.remove(piece.piece_button)
+        self._pieces_holder.remove(piece.piece_button)
         
     def set_highlights(self, squares: list[tuple]):
         """Pass in a list of (row, col) tuples to highlight."""

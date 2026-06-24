@@ -5,7 +5,7 @@ class Queen(Piece):
     def __init__(self, piece):
         super().__init__(piece)
 
-    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple) -> bool: 
+    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool: 
         if not self._rook_behavior(board, from_pos, to_pos) and not self._bishop_behavior(board, from_pos, to_pos):
             return False
         
@@ -16,7 +16,7 @@ class Queen(Piece):
 
         return True
     
-    def _bishop_behavior(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple) -> bool:
+    def _bishop_behavior(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
         from_row, from_col = from_pos
         to_row, to_col = to_pos
 

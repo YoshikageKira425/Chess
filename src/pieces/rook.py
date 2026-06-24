@@ -5,7 +5,7 @@ class Rook(Piece):
     def __init__(self, piece):
         super().__init__(piece)
 
-    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple) -> bool:
+    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
         from_row, from_col = from_pos
         to_row, to_col = to_pos
 
@@ -32,7 +32,7 @@ class Rook(Piece):
 
         return True
     
-    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple) -> list[tuple]:
+    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         from_row, from_col = from_pos
         highlights = []
 
