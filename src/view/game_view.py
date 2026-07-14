@@ -89,7 +89,7 @@ class GameView(arcade.View):
         self.finish_turn()    
     
     def finish_turn(self):
-        print(evaluate(self.board.grid))
+        print(evaluate(self.board))
         if self.board.is_checkmate(not self.turn):
             self._win()
         else:
