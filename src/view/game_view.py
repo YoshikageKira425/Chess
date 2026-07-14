@@ -3,7 +3,7 @@ from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.core.board import Board
 from ..constants import HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
-
+from ..core.bot.evaluator import evaluate
 
 class GameView(arcade.View):
     def __init__(self):
@@ -89,6 +89,7 @@ class GameView(arcade.View):
         self.finish_turn()    
     
     def finish_turn(self):
+        print(evaluate(self.board.grid))
         if self.board.is_checkmate(not self.turn):
             self._win()
         else:
