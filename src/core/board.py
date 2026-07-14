@@ -94,6 +94,29 @@ class Board:
 
         self.grid[row][col] = new_piece
         last.piece = new_piece
+        
+    def get_legal_moves(self, color: str) -> list[tuple]:
+        legal = []
+
+        for row in range(8):
+            for col in range(8):
+                piece = self.grid[row][col]
+                if piece is None or piece.color != color:
+                    continue
+
+                for to_row in range(8):
+                    for to_col in range(8):
+                        if not self.is_valid_move((row, col), (to_row, to_col)):
+                            continue
+
+                        self.move((row, col), (to_row, to_col))
+                        in_check = self.is_king_threatened(color == "w")
+                        self.undo()
+
+                        if not in_check:
+                            legal.append(((row, col), (to_row, to_col)))
+
+        return legal
     
     def undo(self) -> Action | None:
         if not self.actions:
