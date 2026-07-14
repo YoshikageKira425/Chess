@@ -60,6 +60,12 @@ class MainMenuView(arcade.View):
         def on_quit(*args):
             self.quit()
 
+    def on_hide_view(self):
+        self.manager.disable()
+
+    def on_show_view(self):
+        self.manager.enable()
+
     def play(self):
         game_view = GameView()
         self.window.show_view(game_view)
