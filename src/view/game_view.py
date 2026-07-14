@@ -116,6 +116,7 @@ class GameView(arcade.View):
         self.visual.set_highlights(highlights)
         
     def restart(self):
+        print("RESTART")
         self.turn = True
         self.ui.set_turn(self.turn)
         self.ui.remove_win()

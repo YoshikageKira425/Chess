@@ -7,22 +7,95 @@ from src.pieces.queen import Queen
 from src.pieces.king import King
 from src.core.board import Board
 
-scores = {Pawn: 100, Knight: 320, Rook: 500, Bishop: 330, Bishop: 330, Queen: 900}
+MATERIAL_SCORE = {Pawn: 1, Knight: 3, Rook:.05, Bishop: 3, Queen: 9}
 
-def evaluate(board: Board) -> tuple:
-    white_score, black_score = evaluate_pieces(board)
+PAWN_TABLE = [
+    [ 0,  0,  0,  0,  0,  0,  0,  0],
+    [.5, .5, .5, .5, .5, .5, .5, .5],
+    [.2, .2, .2, .4, .4, .2, .2, .2],
+    [.05, .05, .2, 25, 25, .2, .05, .05],
+    [ 0,  0,  0, .2, .2,  0,  0,  0],
+    [.05, -5,-.2,  0,  0,-.2, -5, .05],
+    [.05, .2, .2,-.2,-.2, .2, .2, .05],
+    [ 0,  0,  0,  0,  0,  0,  0,  0],
+]
 
+KNIGHT_TABLE = [
+    [-.5,-.4,-.4,-.4,-.4,-.4,-.4,-.5],
+    [-.4,-.2,  0,  0,  0,  0,-.2,-.4],
+    [-.4,  0, .2, 15, 15, .2,  0,-.4],
+    [-.4, .05, 15, .2, .2, 15, .05,-.4],
+    [-.4,  0, 15, .2, .2, 15,  0,-.4],
+    [-.4, .05, .2, 15, 15, .2, .05,-.4],
+    [-.4,-.2,  0, .05, .05,  0,-.2,-.4],
+    [-.5,-.4,-.4,-.4,-.4,-.4,-.4,-.5],
+]
+
+BISHOP_TABLE = [
+    [-.2,-.2,-.2,-.2,-.2,-.2,-.2,-.2],
+    [-.2,  0,  0,  0,  0,  0,  0,-.2],
+    [-.2,  0, .05, .2, .2, .05,  0,-.2],
+    [-.2, .05, .05, .2, .2, .05, .05,-.2],
+    [-.2,  0, .2, .2, .2, .2,  0,-.2],
+    [-.2, .2, .2, .2, .2, .2, .2,-.2],
+    [-.2, .05,  0,  0,  0,  0, .05,-.2],
+    [-.2,-.2,-.2,-.2,-.2,-.2,-.2,-.2],
+]
+
+ROOK_TABLE = [
+    [ 0,  0,  0,  0,  0,  0,  0,  0],
+    [.05, .2, .2, .2, .2, .2, .2, .05],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [ 0,  0,  0, .05, .05,  0,  0,  0],
+]
+
+QUEEN_TABLE = [
+    [-.2,-.2,-.2, -5, -5,-.2,-.2,-.2],
+    [-.2,  0,  0,  0,  0,  0,  0,-.2],
+    [-.2,  0, .05, .05, .05, .05,  0,-.2],
+    [ -5,  0, .05, .05, .05, .05,  0, -5],
+    [  0,  0, .05, .05, .05, .05,  0, -5],
+    [-.2, .05, .05, .05, .05, .05,  0,-.2],
+    [-.2,  0, .05,  0,  0,  0,  0,-.2],
+    [-.2,-.2,-.2, -5, -5,-.2,-.2,-.2],
+]
+
+KING_TABLE = [
+    [-.4,-.4,-.4,-.5,-.5,-.4,-.4,-.4],
+    [-.4,-.4,-.4,-.5,-.5,-.4,-.4,-.4],
+    [-.4,-.4,-.4,-.5,-.5,-.4,-.4,-.4],
+    [-.4,-.4,-.4,-.5,-.5,-.4,-.4,-.4],
+    [-.2,-.4,-.4,-.4,-.4,-.4,-.4,-.2],
+    [-.2,-.2,-.2,-.2,-.2,-.2,-.2,-.2],
+    [ .2, .2,  0,  0,  0,  0, .2, .2],
+    [ .2, .4, .2,  0,  0, .2, .4, .2],
+]
+
+PIECE_SQUARE_TABLES = {
+    Pawn:   PAWN_TABLE,
+    Knight: KNIGHT_TABLE,
+    Bishop: BISHOP_TABLE,
+    Rook:   ROOK_TABLE,
+    Queen:  QUEEN_TABLE,
+    King:   KING_TABLE,
+}
+
+def evaluate(board: Board) -> int:
     if board.is_king_threatened(False):
-        white_score -= 4000
-        
+        return 40
     if board.is_king_threatened(True):
-        black_score -= 4000
+        return -40 
+    
+    score = evaluate_state(board)
 
-    return (white_score, black_score)
+    return round(score, 3)
 
-def evaluate_pieces(board: Board) -> tuple:
-    white_score = 0
-    black_score = 0
+def evaluate_state(board: Board) -> int:
+    score = 0
 
     for row in range(8):
         for col in range(8):
@@ -31,11 +104,12 @@ def evaluate_pieces(board: Board) -> tuple:
             if piece is None or isinstance(piece, King):
                 continue
 
-            value = scores.get(type(piece), 0)
+            material = MATERIAL_SCORE.get(type(piece), 0)
+            table = PIECE_SQUARE_TABLES.get(type(piece))
+            
+            bonus = table[row][col] if piece.color == "w" else table[7 - row][col]
 
-            if piece.color == "w":
-                white_score += value
-            else:
-                black_score += value
-                
-    return (white_score, black_score)
+            value = material + bonus
+            score += value if piece.color == "w" else -value
+          
+    return score
