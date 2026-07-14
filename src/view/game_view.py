@@ -89,7 +89,8 @@ class GameView(arcade.View):
         self.finish_turn()    
     
     def finish_turn(self):
-        print(evaluate(self.board))
+        score = evaluate(self.board)
+        self.ui.update_eval(score)
         if self.board.is_checkmate(not self.turn):
             self._win()
         else:

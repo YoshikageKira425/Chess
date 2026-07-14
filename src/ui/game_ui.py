@@ -47,6 +47,9 @@ class GameUI:
         self._set_up_pause_ui()
         self._set_up_win_ui()
         self._set_up_promotion_ui()
+        self._set_up_eval_bar()
+        
+        self.update_eval(0)
         
         self._manager.add(self._turn_indicator)
     
@@ -102,6 +105,34 @@ class GameUI:
             style=self._button_style
         )
         self._win_widget.add(self._win_main_menu_button)
+    
+    def _set_up_eval_bar(self):
+        self._eval_white = arcade.gui.UISpace(
+            width=264, height=20,
+            color=arcade.color.WHITE
+        )
+        self._eval_black = arcade.gui.UISpace(
+            width=264, height=20,
+            color=arcade.color.BLACK
+        )
+        self._manager.add(self._eval_black)
+        self._manager.add(self._eval_white)
+
+    def update_eval(self, score: float):
+        BAR_WIDTH = 528      
+        BAR_X = 140         
+        BAR_Y = 15          
+        MAX_SCORE = 10.0
+
+        clamped = max(-MAX_SCORE, min(MAX_SCORE, score))
+        white_width = int((BAR_WIDTH / 2) + (clamped / MAX_SCORE) * (BAR_WIDTH / 2 * 0.8))
+        black_width = BAR_WIDTH - white_width
+        
+        self._eval_black.width = black_width
+        self._eval_black.rect = self._eval_black.rect.align_left(BAR_X).align_bottom(BAR_Y)
+
+        self._eval_white.width = white_width
+        self._eval_white.rect = self._eval_white.rect.align_right(800 - BAR_X).align_bottom(BAR_Y)
     
     def win(self, who_wins: bool):
         self._win_label.text = "WHITE WINS" if who_wins else "BLACK WINS"
