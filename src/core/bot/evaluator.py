@@ -6,8 +6,9 @@ from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
 from src.pieces.king import King
 from src.core.board import Board
+from src.color_enum import Color
 
-MATERIAL_SCORE = {Pawn: 1, Knight: 3, Rook:.05, Bishop: 3, Queen: 9}
+MATERIAL_SCORE = {Pawn: 1, Knight: 3, Rook:5, Bishop: 3, Queen: 9}
 
 PAWN_TABLE = [
     [ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -107,9 +108,9 @@ def evaluate_state(board: Board) -> int:
             material = MATERIAL_SCORE.get(type(piece), 0)
             table = PIECE_SQUARE_TABLES.get(type(piece))
             
-            bonus = table[row][col] if piece.color == "w" else table[7 - row][col]
+            bonus = table[row][col] if piece.color == Color.WHITE else table[7 - row][col]
 
             value = material + bonus
-            score += value if piece.color == "w" else -value
+            score += value if piece.color == Color.WHITE else -value
           
     return score

@@ -1,5 +1,6 @@
 import arcade
 import arcade.gui
+from src.color_enum import Color
 
 textures = {
     "wp": arcade.load_texture("assets/sprites/white_pieces/pawn_white.png"),
@@ -18,7 +19,7 @@ textures = {
 
 class Piece():
     def __init__(self, piece: str):
-        self.color = piece[0]
+        self.color = Color(piece[0])
         self.piece_button = arcade.gui.UITextureButton(
             texture=textures[piece.lower()],
             x=0,

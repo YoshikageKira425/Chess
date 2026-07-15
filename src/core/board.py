@@ -6,6 +6,7 @@ from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
 from src.pieces.king import King
 from src.action import Action
+from src.color_enum import Color
 
 
 class Board:
@@ -78,8 +79,8 @@ class Board:
 
         piece = last.piece
         return isinstance(piece, Pawn) and (
-            (piece.color == "w" and piece.row == 0) or
-            (piece.color == "b" and piece.row == 7)
+            (piece.color == Color.WHITE and piece.row == 0) or
+            (piece.color == Color.BLACK and piece.row == 7)
         )
 
     def promote(self, piece_type: str):
@@ -110,7 +111,7 @@ class Board:
                             continue
 
                         self.move((row, col), (to_row, to_col))
-                        in_check = self.is_king_threatened(color == "w")
+                        in_check = self.is_king_threatened(color == Color.WHITE)
                         self.undo()
 
                         if not in_check:
@@ -134,7 +135,7 @@ class Board:
         return action
 
     def is_king_threatened(self, turn: bool) -> bool:
-        enemy_color = "b" if turn else "w"
+        enemy_color = Color.BLACK if turn else Color.WHITE
         king = self.white_king if turn else self.black_king
         
         for row in range(8):
@@ -153,7 +154,7 @@ class Board:
         if not self.is_king_threatened(turn):
             return False
 
-        friendly_color = "w" if turn else "b"
+        friendly_color = Color.WHITE if turn else Color.BLACK
 
         for row in range(8):
             for col in range(8):

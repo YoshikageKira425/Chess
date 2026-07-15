@@ -4,6 +4,7 @@ from src.ui.game_ui import GameUI
 from src.core.board import Board
 from ..constants import HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
 from ..core.bot.evaluator import evaluate
+from ..color_enum import Color
 
 class GameView(arcade.View):
     def __init__(self):
@@ -38,9 +39,9 @@ class GameView(arcade.View):
             return
 
         piece = self.board.get(row, col)
-        if piece.color == "w" and not self.turn:
+        if piece.color == Color.WHITE and not self.turn:
             return
-        if piece.color == "b" and self.turn:
+        if piece.color == Color.BLACK and self.turn:
             return
 
         self.selected = (row, col)
