@@ -8,7 +8,7 @@ class Bot:
         self.board = copy.deepcopy(board)
         self.max_depth = 2
 
-    def search(self, depth: int) -> tuple:
+    def search(self, depth: int, alpha:float=float('-inf'), beta:float=float('inf')) -> tuple:
         if depth == self.max_depth:
             return (evaluate(self.board), None, None)
 
@@ -22,13 +22,17 @@ class Bot:
             from_pos, to_pos = move[0], move[1]
 
             self.board.move(from_pos, to_pos)
-            score, _, _ = self.search(depth + 1)
+            score, _, _ = self.search(depth + 1, alpha, beta)
             self.board.undo()
-
+            
             if is_minimizing and score < best_score:
                 best_score, best_from, best_to = score, from_pos, to_pos
             elif not is_minimizing and score > best_score:
                 best_score, best_from, best_to = score, from_pos, to_pos
+                
+            alpha = max(alpha, best_score)
+            if beta <= alpha:
+                break
 
         return (best_score, best_from, best_to)
 
