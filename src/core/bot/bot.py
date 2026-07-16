@@ -1,14 +1,13 @@
 from src.core.board import Board
-import copy
 from .evaluator import evaluate
 from src.color_enum import Color
 
 class Bot:
     def __init__(self, board: Board):
-        self.board = copy.deepcopy(board)
+        self.board = board
         self.max_depth = 2
 
-    def search(self, depth: int, alpha:float=float('-inf'), beta:float=float('inf')) -> tuple:
+    def _search_move(self, depth: int, alpha:float=float('-inf'), beta:float=float('inf')) -> tuple:
         if depth == self.max_depth:
             return (evaluate(self.board), None, None)
 
@@ -22,7 +21,7 @@ class Bot:
             from_pos, to_pos = move[0], move[1]
 
             self.board.move(from_pos, to_pos)
-            score, _, _ = self.search(depth + 1, alpha, beta)
+            score, _, _ = self._search_move(depth + 1, alpha, beta)
             self.board.undo()
             
             if is_minimizing and score < best_score:
@@ -36,4 +35,6 @@ class Bot:
 
         return (best_score, best_from, best_to)
 
-        
+    def get_move(self):
+        _, from_pos, to_pos = self._search_move(0)
+        return (from_pos, to_pos)

@@ -2,13 +2,16 @@ import arcade
 from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.core.board import Board
+from src.core.bot.bot import Bot
 from ..constants import HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
 from ..core.bot.evaluator import evaluate
 from ..color_enum import Color
 
 class GameView(arcade.View):
-    def __init__(self):
+    def __init__(self, is_bot:bool = True):
         super().__init__(background_color=arcade.color.GRAY)
+
+        self.is_bot = is_bot
 
         self.selected = None
         self.turn = True
@@ -17,6 +20,8 @@ class GameView(arcade.View):
 
         self.board = Board()
         self.setup_board()
+        
+        self.bot = Bot(self.board)
 
         self.visual = GameVisual(self.board.grid)
         self.ui = GameUI()
@@ -92,11 +97,17 @@ class GameView(arcade.View):
     def finish_turn(self):
         score = evaluate(self.board)
         self.ui.update_eval(score)
+        
         if self.board.is_checkmate(not self.turn):
             self._win()
-        else:
-            self.turn = not self.turn
-            self.ui.set_turn(self.turn)
+            return
+
+        self.turn = not self.turn
+        self.ui.set_turn(self.turn)
+
+        if not self.turn and self.is_bot:
+            from_pos, to_pos = self.bot.get_move()
+            self.move_piece(from_pos, to_pos)
         
     def _win(self):
         self.is_win = True
