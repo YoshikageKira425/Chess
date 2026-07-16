@@ -2,10 +2,16 @@ from src.core.board import Board
 from .evaluator import evaluate
 from src.color_enum import Color
 
+DIFFICULTY = {
+    "easy":   1,
+    "medium": 2,
+    "hard":   3,
+}
+
 class Bot:
-    def __init__(self, board: Board):
+    def __init__(self, board: Board, difficulty: str = "easy"):
         self.board = board
-        self.max_depth = 2
+        self.max_depth = DIFFICULTY[difficulty]
 
     def _search_move(self, depth: int, alpha:float=float('-inf'), beta:float=float('inf')) -> tuple:
         if depth == self.max_depth:

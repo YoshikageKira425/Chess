@@ -8,7 +8,7 @@ from ..core.bot.evaluator import evaluate
 from ..color_enum import Color
 
 class GameView(arcade.View):
-    def __init__(self, is_bot:bool = True):
+    def __init__(self, is_bot:bool = True, difficulty: str = "easy"):
         super().__init__(background_color=arcade.color.GRAY)
 
         self.is_bot = is_bot
@@ -21,7 +21,7 @@ class GameView(arcade.View):
         self.board = Board()
         self.setup_board()
         
-        self.bot = Bot(self.board)
+        self.bot = Bot(self.board, difficulty)
 
         self.visual = GameVisual(self.board.grid)
         self.ui = GameUI()
