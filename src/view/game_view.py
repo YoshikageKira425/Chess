@@ -1,4 +1,5 @@
 import arcade
+import random
 from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.core.board import Board
@@ -11,8 +12,6 @@ class GameView(arcade.View):
     def __init__(self, is_bot:bool = True, difficulty: str = "easy"):
         super().__init__(background_color=arcade.color.GRAY)
 
-        self.is_bot = is_bot
-
         self.selected = None
         self.turn = True
         self.is_pause = False
@@ -20,12 +19,18 @@ class GameView(arcade.View):
 
         self.board = Board()
         self.setup_board()
-        
-        self.bot = Bot(self.board, difficulty)
 
         self.visual = GameVisual(self.board.grid)
         self.ui = GameUI()
         self.ui.set_up_ui_buttons(self.unpause, self.restart, self.main_menu)
+        
+        self.is_bot = is_bot
+        self.your_color = Color.BLACK if random.random() > 0.5 else Color.WHITE
+        bot_color = Color.WHITE if self.your_color == Color.BLACK else Color.BLACK
+        self.bot = Bot(self.board, bot_color, difficulty)
+            
+        if self.your_color == Color.BLACK and is_bot:
+            self.bot_move()
 
     def setup_board(self):
         for row in range(8):
@@ -105,14 +110,17 @@ class GameView(arcade.View):
         self.turn = not self.turn
         self.ui.set_turn(self.turn)
 
-        if not self.turn and self.is_bot:
-            from_pos, to_pos = self.bot.get_move()
-            self.move_piece(from_pos, to_pos)
+        if self.is_bot and self.bot.bot_color == (Color.WHITE if self.turn else Color.BLACK):
+            self.bot_move()
         
     def _win(self):
         self.is_win = True
         self.stop_moving()
         self.ui.win(self.turn)
+
+    def bot_move(self):
+        from_pos, to_pos = self.bot.get_move()
+        self.move_piece(from_pos, to_pos)
 
     def stop_moving(self):
         self.visual.clear_highlights()
@@ -135,6 +143,10 @@ class GameView(arcade.View):
         
     def restart(self):
         self.turn = True
+        
+        self.your_color = Color.BLACK if random.random() > 0.5 else Color.WHITE
+        self.bot.bot_color = Color.WHITE if self.your_color == Color.BLACK else Color.BLACK
+        
         self.ui.set_turn(self.turn)
         self.ui.remove_win()
         self.is_win = False
@@ -144,6 +156,10 @@ class GameView(arcade.View):
 
         self.setup_board()
         self.visual.set_board(self.board.grid)
+        self.visual.set_highlights([])
+        
+        if self.your_color == Color.BLACK and self.is_bot:
+            self.bot_move()
     
     def main_menu(self):
         from src.view.main_menu_view import MainMenuView

@@ -9,16 +9,18 @@ DIFFICULTY = {
 }
 
 class Bot:
-    def __init__(self, board: Board, difficulty: str = "easy"):
+    def __init__(self, board: Board, color:Color, difficulty: str = "easy"):
         self.board = board
         self.max_depth = DIFFICULTY[difficulty]
+        self.bot_color = color
 
-    def _search_move(self, depth: int, alpha:float=float('-inf'), beta:float=float('inf')) -> tuple:
+    def _search_move(self, depth: int, alpha: float = float('-inf'), beta: float = float('inf')) -> tuple:
         if depth == self.max_depth:
             return (evaluate(self.board), None, None)
 
-        current_turn = Color.BLACK if depth % 2 == 0 else Color.WHITE
-        is_minimizing = current_turn == Color.BLACK
+        opponent_color = Color.WHITE if self.bot_color == Color.BLACK else Color.BLACK
+        current_turn = self.bot_color if depth % 2 == 0 else opponent_color
+        is_minimizing = current_turn == self.bot_color
 
         best_score = float('inf') if is_minimizing else float('-inf')
         best_from, best_to = None, None
@@ -29,13 +31,14 @@ class Bot:
             self.board.move(from_pos, to_pos)
             score, _, _ = self._search_move(depth + 1, alpha, beta)
             self.board.undo()
-            
+
             if is_minimizing and score < best_score:
                 best_score, best_from, best_to = score, from_pos, to_pos
+                beta = min(beta, best_score)
             elif not is_minimizing and score > best_score:
                 best_score, best_from, best_to = score, from_pos, to_pos
-                
-            alpha = max(alpha, best_score)
+                alpha = max(alpha, best_score)
+
             if beta <= alpha:
                 break
 
