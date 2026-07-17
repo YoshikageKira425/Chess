@@ -7,13 +7,18 @@ class Knight(Piece):
         
     def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
         from_row, from_col = from_pos
+        to_row, to_col = to_pos
         
         possible_moves = [(from_row + 1, from_col + 2), (from_row - 1, from_col + 2), 
                           (from_row + 2, from_col + 1), (from_row + 2, from_col - 1), 
                           (from_row - 2, from_col + 1), (from_row - 2, from_col - 1), 
                           (from_row + 1, from_col - 2), (from_row - 1, from_col - 2)]
         
-        return to_pos in possible_moves
+        piece = board[to_row][to_col]
+        if to_pos in possible_moves and (not piece or piece.color != self.color):
+            return True
+        
+        return False
     
     def move_hightlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         from_row, from_col = from_pos
