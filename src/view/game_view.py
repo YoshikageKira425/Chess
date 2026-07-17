@@ -3,7 +3,7 @@ from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.core.board import Board
 from src.core.bot.bot import Bot
-from ..constants import HIGHLIGHT_SELECTED, BOARD_OFFSET_X, BOARD_OFFSET_Y
+from ..constants import HIGHLIGHT_SELECTED, HIGHLIGHT_CAPTURE, BOARD_OFFSET_X, BOARD_OFFSET_Y
 from ..core.bot.evaluator import evaluate
 from ..color_enum import Color
 
@@ -125,6 +125,11 @@ class GameView(arcade.View):
         last_action = self.board.last_action()
         
         highlights.extend(self.board.get(row, col).move_hightlight(self.board.grid, self.selected, last_action))
+        
+        if self.board.is_king_threatened(self.turn):
+            king = self.board.white_king if self.turn else self.board.black_king
+             
+            highlights.append((king.row, king.col, HIGHLIGHT_CAPTURE))
         
         self.visual.set_highlights(highlights)
         
