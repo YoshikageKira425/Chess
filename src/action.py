@@ -8,3 +8,4 @@ class Action:
     to_pos: tuple
     piece: Piece
     captured: Piece | None = None
+    promotion: Piece | None = None

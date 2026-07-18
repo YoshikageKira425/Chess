@@ -120,7 +120,9 @@ class GameView(arcade.View):
 
     def bot_move(self):
         from_pos, to_pos = self.bot.get_move()
-        self.move_piece(from_pos, to_pos)
+        
+        if from_pos and to_pos:
+            self.move_piece(from_pos, to_pos)
 
     def stop_moving(self):
         self.visual.clear_highlights()
@@ -153,10 +155,10 @@ class GameView(arcade.View):
 
         self.unpause()
         self.board.setup_board()
+        self.stop_moving()
 
         self.setup_board()
         self.visual.set_board(self.board.grid)
-        self.visual.set_highlights([])
         
         if self.your_color == Color.BLACK and self.is_bot:
             self.bot_move()
@@ -171,15 +173,54 @@ class GameView(arcade.View):
         self.ui.unpause()
 
     def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.TAB and not self.is_win:
+        if symbol in [arcade.key.TAB, arcade.key.ESCAPE, arcade.key.P] and not self.is_win:
             self.is_pause = not self.is_pause
 
             if self.is_pause:
                 self.ui.pause()
             else:
                 self.ui.unpause()
+                
+        if symbol == arcade.key.SPACE and not self.is_win:
+            action = self.board.undo()
+            if self.is_bot:
+                if action:
+                    self._undo_visual(action)
+                action = self.board.undo()
+                if action:
+                    self._undo_visual(action)
+            else:
+                if action:
+                    self._undo_visual(action)
+
+            score = evaluate(self.board)
+            self.ui.update_eval(score)
+            self.turn = not self.turn  
+            self.ui.set_turn(self.turn)
+            self.stop_moving()
 
         return super().on_key_press(symbol, modifiers)
+    
+    def _undo_visual(self, action):
+        from src.pieces.pawn import Pawn
+
+        piece = action.piece
+        from_row, from_col = action.from_pos
+        piece.set_position(from_row, from_col)
+        piece.set_button_callback(lambda r=from_row, c=from_col: self.on_piece_clicked(r, c))
+
+        if action.captured is not None:
+            to_row, to_col = action.to_pos
+            captured = action.captured
+
+            if isinstance(piece, Pawn) and captured.row != to_row:
+                self.visual.add_piece(captured, captured.row, captured.col)
+            else:
+                self.visual.add_piece(captured, to_row, to_col)
+
+            captured.set_button_callback(
+                lambda r=captured.row, c=captured.col: self.on_piece_clicked(r, c)
+            )
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.is_pause or self.is_win:

@@ -96,6 +96,13 @@ class Board:
         self.grid[row][col] = new_piece
         last.piece = new_piece
         
+        self.actions.append(Action(
+            from_pos=last.from_pos,
+            to_pos=last.to_pos,
+            piece=last.piece,
+            promotion=new_piece
+        ))
+        
     def get_legal_moves(self, color: str) -> list[tuple]:
         legal = []
 
@@ -127,10 +134,16 @@ class Board:
         from_row, from_col = action.from_pos
         to_row, to_col = action.to_pos
 
-        self.grid[from_row][from_col] = action.piece
+        if not action.promotion:
+            self.grid[from_row][from_col] = action.piece
+        else:
+            self.grid[from_row][from_col] = action.promotion
         action.piece.set_indexes(from_row, from_col)
         
         self.grid[to_row][to_col] = action.captured
+        
+        if action.captured is not None:
+            action.captured.set_indexes(action.captured.row, action.captured.col)
         
         return action
 
