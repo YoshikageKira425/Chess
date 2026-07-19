@@ -108,12 +108,12 @@ class GameView(arcade.View):
         score = evaluate(self.board)
         self.ui.update_eval(score)
         
-        if self.board.is_checkmate(not self.turn):
-            self._win()
-            return
-        
         if self.board.is_stalemate(not self.turn):
             self._stalemate()
+            return
+        
+        if self.board.is_checkmate(not self.turn):
+            self._win()
             return
 
         self.turn = not self.turn

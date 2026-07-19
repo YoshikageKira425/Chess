@@ -166,30 +166,9 @@ class Board:
         return not self.is_king_threatened(turn) and len(self.get_legal_moves(color)) == 0
     
     def is_checkmate(self, turn: bool) -> bool:
-        if not self.is_king_threatened(turn):
-            return False
-
-        friendly_color = Color.WHITE if turn else Color.BLACK
-
-        for row in range(8):
-            for col in range(8):
-                piece = self.grid[row][col]
-                if piece is None or piece.color != friendly_color:
-                    continue
-
-                for to_row in range(8):
-                    for to_col in range(8):
-                        if not self.is_valid_move((row, col), (to_row, to_col)):
-                            continue
-
-                        self.move((row, col), (to_row, to_col))
-                        still_threatened = self.is_king_threatened(turn)
-                        self.undo()
-
-                        if not still_threatened:
-                            return False
-
-        return True
+        color = Color.WHITE if turn else Color.BLACK
+        
+        return len(self.get_legal_moves(color)) == 0
 
     def is_within_bounds(self, row: int, col: int) -> bool:
         return 0 <= row <= 7 and 0 <= col <= 7
