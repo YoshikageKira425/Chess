@@ -75,7 +75,6 @@ class GameView(arcade.View):
         piece = self.board.get(to_row, to_col)
         piece.set_position(to_row, to_col)
         piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
-        piece.pieced_moved()
         
         if self.board.is_promotion():
             if self.is_bot and self.bot.bot_color == (Color.WHITE if self.turn else Color.BLACK):
@@ -148,7 +147,7 @@ class GameView(arcade.View):
         
         last_action = self.board.last_action()
         
-        highlights.extend(self.board.get(row, col).move_hightlight(self.board.grid, self.selected, last_action))
+        highlights.extend(self.board.get(row, col).move_highlight(self.board.grid, self.selected, last_action))
         
         if self.board.is_king_threatened(self.turn):
             king = self.board.white_king if self.turn else self.board.black_king

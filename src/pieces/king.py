@@ -35,7 +35,7 @@ class King(Piece):
         
         return False
     
-    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
+    def move_highlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         from_row, from_col = from_pos
         highlights = []
         

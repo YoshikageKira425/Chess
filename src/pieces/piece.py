@@ -39,12 +39,9 @@ class Piece():
     def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
         return True
     
-    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
+    def move_highlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         return []
     
-    def pieced_moved(self):
-        pass
-        
     def set_position(self, row: int, col: int):
         self.set_indexes(row, col)
         
