@@ -15,8 +15,8 @@ class Board:
         
     def setup_board(self):
         self.grid: list[list[Piece]] = [
-            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), None],
-            [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), None],
+            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
+            [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
@@ -159,6 +159,11 @@ class Board:
                     return True
         
         return False
+    
+    def is_stalemate(self, turn: bool) -> bool:
+        color = Color.WHITE if turn else Color.BLACK
+        
+        return not self.is_king_threatened(turn) and len(self.get_legal_moves(color)) == 0
     
     def is_checkmate(self, turn: bool) -> bool:
         if not self.is_king_threatened(turn):

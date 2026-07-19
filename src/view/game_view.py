@@ -107,6 +107,10 @@ class GameView(arcade.View):
         if self.board.is_checkmate(not self.turn):
             self._win()
             return
+        
+        if self.board.is_stalemate(not self.turn):
+            self._stalemate()
+            return
 
         self.turn = not self.turn
         self.ui.set_turn(self.turn)
@@ -118,6 +122,11 @@ class GameView(arcade.View):
         self.is_win = True
         self.stop_moving()
         self.ui.win(self.turn)
+        
+    def _stalemate(self):
+        self.is_win = True
+        self.stop_moving()
+        self.ui.stalemate()
 
     def bot_move(self):
         from_pos, to_pos = self.bot.get_move()

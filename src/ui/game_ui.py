@@ -138,6 +138,11 @@ class GameUI:
         self._win_label.text = "WHITE WINS" if who_wins else "BLACK WINS"
         self._win_piece_image.texture = self.white_king_texture if who_wins else self.black_king_texture
         self._manager.add(self._win_widget)
+        
+    def stalemate(self):
+        self._win_label.text = "STALEMATE"
+        self._win_piece_image.texture = self.white_king_texture
+        self._manager.add(self._win_widget)
 
     def remove_win(self):
         try:
