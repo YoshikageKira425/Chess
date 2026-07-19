@@ -15,8 +15,8 @@ class Board:
         
     def setup_board(self):
         self.grid: list[list[Piece]] = [
-            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
-            [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
+            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), None],
+            [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
@@ -94,14 +94,9 @@ class Board:
         new_piece.set_indexes(row, col)
 
         self.grid[row][col] = new_piece
-        last.piece = new_piece
         
-        self.actions.append(Action(
-            from_pos=last.from_pos,
-            to_pos=last.to_pos,
-            piece=last.piece,
-            promotion=new_piece
-        ))
+        last.original_piece = last.piece
+        last.piece = new_piece
         
     def get_legal_moves(self, color: str) -> list[tuple]:
         legal = []
@@ -134,12 +129,14 @@ class Board:
         from_row, from_col = action.from_pos
         to_row, to_col = action.to_pos
 
-        if not action.promotion:
-            self.grid[from_row][from_col] = action.piece
+        if action.original_piece:
+            pawn = action.original_piece
+            self.grid[from_row][from_col] = pawn
+            pawn.set_indexes(from_row, from_col)
         else:
-            self.grid[from_row][from_col] = action.promotion
-        action.piece.set_indexes(from_row, from_col)
-        
+            self.grid[from_row][from_col] = action.piece
+            action.piece.set_indexes(from_row, from_col)
+
         self.grid[to_row][to_col] = action.captured
         
         if action.captured is not None:

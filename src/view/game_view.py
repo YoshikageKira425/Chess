@@ -7,6 +7,7 @@ from src.core.bot.bot import Bot
 from ..constants import HIGHLIGHT_SELECTED, HIGHLIGHT_CAPTURE, BOARD_OFFSET_X, BOARD_OFFSET_Y
 from ..core.bot.evaluator import evaluate
 from ..color_enum import Color
+from ..action import Action
 
 class GameView(arcade.View):
     def __init__(self, is_bot:bool = True, difficulty: str = "easy"):
@@ -181,15 +182,13 @@ class GameView(arcade.View):
             else:
                 self.ui.unpause()
                 
-        if symbol == arcade.key.SPACE and not self.is_win:
+        if symbol == arcade.key.SPACE and not self.is_win and self.board.actions:
             action = self.board.undo()
+            if action:
+                self._undo_visual(action)
+                
             if self.is_bot:
-                if action:
-                    self._undo_visual(action)
                 action = self.board.undo()
-                if action:
-                    self._undo_visual(action)
-            else:
                 if action:
                     self._undo_visual(action)
 
@@ -201,25 +200,29 @@ class GameView(arcade.View):
 
         return super().on_key_press(symbol, modifiers)
     
-    def _undo_visual(self, action):
-        from src.pieces.pawn import Pawn
-
+    def _undo_visual(self, action: Action):
         piece = action.piece
         from_row, from_col = action.from_pos
         piece.set_position(from_row, from_col)
         piece.set_button_callback(lambda r=from_row, c=from_col: self.on_piece_clicked(r, c))
 
         if action.captured is not None:
-            to_row, to_col = action.to_pos
             captured = action.captured
 
-            if isinstance(piece, Pawn) and captured.row != to_row:
-                self.visual.add_piece(captured, captured.row, captured.col)
-            else:
-                self.visual.add_piece(captured, to_row, to_col)
+            self.visual.add_piece(captured, captured.row, captured.col)
 
             captured.set_button_callback(
                 lambda r=captured.row, c=captured.col: self.on_piece_clicked(r, c)
+            )
+            
+        if action.original_piece is not None:
+            original_piece = action.original_piece
+
+            self.visual.add_piece(original_piece, original_piece.row, original_piece.col)
+            self.visual.remove_piece(action.piece)
+
+            original_piece.set_button_callback(
+                lambda r=original_piece.row, c=original_piece.col: self.on_piece_clicked(r, c)
             )
 
     def on_mouse_press(self, x, y, button, modifiers):
