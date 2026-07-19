@@ -78,7 +78,11 @@ class GameView(arcade.View):
         piece.pieced_moved()
         
         if self.board.is_promotion():
-            self.ui.show_promotion(self._on_promotion)
+            if self.is_bot and self.bot.bot_color == (Color.WHITE if self.turn else Color.BLACK):
+                self._on_promotion(self.bot.chose_promotion())
+            else:
+                self.ui.show_promotion(self._on_promotion)
+                
             return
 
         self.finish_turn()

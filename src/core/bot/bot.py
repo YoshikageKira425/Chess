@@ -14,7 +14,7 @@ class Bot:
         self.max_depth = DIFFICULTY[difficulty]
         self.bot_color = color
 
-    def _search_move(self, depth: int, alpha: float = float('-inf'), beta: float = float('inf')) -> tuple:
+    def _search_move(self, depth: int=0, alpha: float = float('-inf'), beta: float = float('inf')) -> tuple:
         if depth == self.max_depth:
             return (evaluate(self.board), None, None)
 
@@ -43,7 +43,27 @@ class Bot:
                 break
 
         return (best_score, best_from, best_to)
+    
+    def chose_promotion(self) -> str:
+        best_score = float('-inf')
+        result = "Q"  
+        alpha = float('-inf')
+        beta = float('inf')
+        
+        for promotion in ["Q", "N", "R", "B"]:
+            self.board.promote(promotion)
+            
+            score, _, _ = self._search_move(alpha=alpha, beta=beta)
+            
+            self.board.undo()
+            
+            if score > best_score:
+                result = promotion
+                best_score = score
+                alpha = max(alpha, best_score)
+                
+        return result
 
     def get_move(self):
-        _, from_pos, to_pos = self._search_move(0)
+        _, from_pos, to_pos = self._search_move()
         return (from_pos, to_pos)
