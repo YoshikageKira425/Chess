@@ -15,14 +15,14 @@ class Board:
         
     def setup_board(self):
         self.grid: list[list[Piece]] = [
-            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
-            [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
+            [Rook(Color.BLACK), Knight(Color.BLACK), Bishop(Color.BLACK), Queen(Color.BLACK), King(Color.BLACK), Bishop(Color.BLACK), Knight(Color.BLACK), Rook(Color.BLACK)],
+            [Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK)],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
-            [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), King("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
+            [Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE)],
+            [Rook(Color.WHITE), Knight(Color.WHITE), Bishop(Color.WHITE), Queen(Color.WHITE), King(Color.WHITE), Bishop(Color.WHITE), Knight(Color.WHITE), Rook(Color.WHITE)],
         ]
         
         self.white_king = self.grid[7][4]
@@ -41,6 +41,11 @@ class Board:
         piece = self.grid[from_row][from_col]
         piece.set_position(to_row, to_col)
         
+        first_move = False
+        if hasattr(piece, 'has_moved') and not piece.has_moved:
+            piece.has_moved = True
+            first_move = True
+        
         captured = self.grid[to_row][to_col]
         
         en_passant_captured = None
@@ -48,6 +53,21 @@ class Board:
             en_passant_captured = self.grid[from_row][to_col]
             self.grid[from_row][to_col] = None
             captured = en_passant_captured
+            
+        castled_rook = castled_rook_from = castled_rook_to = None
+        if isinstance(piece, King) and abs(to_col - from_col) == 2:
+            rook_from_col = 7 if to_col == 6 else 0
+            rook_to_col = 5 if to_col == 6 else 3
+            rook = self.grid[from_row][rook_from_col]
+
+            castled_rook = rook
+            castled_rook_from = (from_row, rook_from_col)
+            castled_rook_to = (from_row, rook_to_col)
+
+            self.grid[from_row][rook_to_col]   = rook
+            self.grid[from_row][rook_from_col] = None
+            rook.set_position(from_row, rook_to_col)
+            rook.has_moved = True
         
         self.grid[to_row][to_col] = piece
         self.grid[from_row][from_col] = None
@@ -56,7 +76,11 @@ class Board:
             from_pos=from_pos,
             to_pos=to_pos,
             piece=piece,
-            captured=captured
+            captured=captured,
+            first_move=first_move,
+            castled_rook=castled_rook,
+            castled_rook_from=castled_rook_from,
+            castled_rook_to=castled_rook_to,
         ))
 
         return captured
@@ -128,6 +152,18 @@ class Board:
         action = self.actions.pop()
         from_row, from_col = action.from_pos
         to_row, to_col = action.to_pos
+        
+        if action.first_move:
+            action.piece.has_moved = False
+
+        if action.castled_rook is not None:
+            rook = action.castled_rook
+            rf_row, rf_col = action.castled_rook_from
+            rt_row, rt_col = action.castled_rook_to
+            self.grid[rf_row][rf_col] = rook
+            self.grid[rt_row][rt_col] = None
+            rook.set_position(rf_row, rf_col)
+            rook.has_moved = False
 
         if action.original_piece:
             pawn = action.original_piece

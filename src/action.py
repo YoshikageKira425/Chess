@@ -9,3 +9,7 @@ class Action:
     piece: Piece
     captured: Piece | None = None
     original_piece: Piece | None = None
+    first_move: bool = False         
+    castled_rook: Piece | None = None         
+    castled_rook_from: tuple | None = None
+    castled_rook_to: tuple | None = None

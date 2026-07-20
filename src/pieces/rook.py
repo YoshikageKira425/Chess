@@ -4,6 +4,8 @@ from .sliding_logic import straight_path_clear, generate_highlight_lines
 class Rook(Piece):
     def __init__(self, piece):
         super().__init__(piece)
+        
+        self.has_moved = False
 
     def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
         if not straight_path_clear(board, from_pos, to_pos):
