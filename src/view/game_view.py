@@ -45,7 +45,6 @@ class GameView(arcade.View):
 
         piece = self.board.get(row, col)
         if piece is None:
-            print(self.board.grid)
             return
         
         if piece.color == Color.WHITE and not self.turn:
@@ -66,8 +65,6 @@ class GameView(arcade.View):
             self.board.undo()
             return
         
-        self.visual.update_board(self.board.grid, self.on_piece_clicked)
-        
         if self.board.is_promotion():
             if self.is_bot and self.bot.bot_color == (Color.WHITE if self.turn else Color.BLACK):
                 self._on_promotion(self.bot.chose_promotion())
@@ -82,20 +79,14 @@ class GameView(arcade.View):
         last = self.board.last_action()
         to_row, to_col = last.to_pos
 
-        old_piece = self.board.get(to_row, to_col)
-        self.visual.remove_piece(old_piece)
+        self.board.get(to_row, to_col)
 
         self.board.promote(piece_type)
-
-        new_piece = self.board.get(to_row, to_col)
-        self.visual.add_piece(new_piece, to_row, to_col)
-        new_piece.set_button_callback(
-            lambda r=to_row, c=to_col: self.on_piece_clicked(r, c)
-        )
 
         self.finish_turn()    
     
     def finish_turn(self):
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
         score = evaluate(self.board)
         self.ui.update_eval(score)
         
@@ -160,10 +151,8 @@ class GameView(arcade.View):
 
         self.unpause()
         self.board.setup_board()
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
         self.stop_moving()
-
-        self.setup_board()
-        self.visual.set_board(self.board.grid)
         
         if self.your_color == Color.BLACK and self.is_bot:
             self.bot_move()
@@ -187,14 +176,12 @@ class GameView(arcade.View):
                 self.ui.unpause()
                 
         if symbol == arcade.key.SPACE and not self.is_win and self.board.actions:
-            action = self.board.undo()
-            if action:
-                self._undo_visual(action)
+            self.board.undo()
                 
             if self.is_bot:
-                action = self.board.undo()
-                if action:
-                    self._undo_visual(action)
+                self.board.undo()
+
+            self.visual.update_board(self.board.grid, self.on_piece_clicked)
 
             score = evaluate(self.board)
             self.ui.update_eval(score)
@@ -203,31 +190,6 @@ class GameView(arcade.View):
             self.stop_moving()
 
         return super().on_key_press(symbol, modifiers)
-    
-    def _undo_visual(self, action: Action):
-        piece = action.piece
-        from_row, from_col = action.from_pos
-        piece.set_position_board(from_row, from_col)
-        piece.set_button_callback(lambda r=from_row, c=from_col: self.on_piece_clicked(r, c))
-
-        if action.captured is not None:
-            captured = action.captured
-
-            self.visual.add_piece(captured, captured.row, captured.col)
-
-            captured.set_button_callback(
-                lambda r=captured.row, c=captured.col: self.on_piece_clicked(r, c)
-            )
-            
-        if action.original_piece is not None:
-            original_piece = action.original_piece
-
-            self.visual.add_piece(original_piece, original_piece.row, original_piece.col)
-            self.visual.remove_piece(action.piece)
-
-            original_piece.set_button_callback(
-                lambda r=original_piece.row, c=original_piece.col: self.on_piece_clicked(r, c)
-            )
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.is_pause or self.is_win:

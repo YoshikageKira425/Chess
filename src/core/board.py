@@ -24,11 +24,19 @@ class Board:
             [Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE)],
             [Rook(Color.WHITE), Knight(Color.WHITE), Bishop(Color.WHITE), Queen(Color.WHITE), King(Color.WHITE), Bishop(Color.WHITE), Knight(Color.WHITE), Rook(Color.WHITE)],
         ]
+        self._update_piece_positions()
         
         self.white_king = self.grid[7][4]
         self.black_king = self.grid[0][4]
         
         self.actions: list[Action] = []
+        
+    def _update_piece_positions(self):
+        for row, row_data in enumerate(self.grid):
+            for col, piece in enumerate(row_data):
+                if piece:
+                    piece.row = row
+                    piece.col = col
 
     def get(self, row: int, col: int) -> Piece | None:
         return self.grid[row][col]
