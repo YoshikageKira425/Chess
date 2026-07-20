@@ -64,7 +64,7 @@ class Board:
             castled_rook_from = (from_row, rook_from_col)
             castled_rook_to = (from_row, rook_to_col)
 
-            self.grid[from_row][rook_to_col]   = rook
+            self.grid[from_row][rook_to_col] = rook
             self.grid[from_row][rook_from_col] = None
             rook.set_position(from_row, rook_to_col)
             rook.has_moved = True
@@ -82,8 +82,6 @@ class Board:
             castled_rook_from=castled_rook_from,
             castled_rook_to=castled_rook_to,
         ))
-
-        return captured
 
     def is_valid_move(self, from_pos: tuple, to_pos: tuple) -> bool:
         from_row, from_col = from_pos

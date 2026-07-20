@@ -19,11 +19,12 @@ class GameView(arcade.View):
         self.is_win = False
 
         self.board = Board()
-        self.setup_board()
 
-        self.visual = GameVisual(self.board.grid)
+        self.visual = GameVisual()
         self.ui = GameUI()
+        
         self.ui.set_up_ui_buttons(self.unpause, self.restart, self.main_menu)
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
         
         self.is_bot = is_bot
         self.your_color = Color.BLACK if random.random() > 0.5 else Color.WHITE
@@ -32,13 +33,6 @@ class GameView(arcade.View):
             
         if self.your_color == Color.BLACK and is_bot:
             self.bot_move()
-
-    def setup_board(self):
-        for row in range(8):
-            for col in range(8):
-                piece = self.board.get(row, col)
-                if piece is not None:
-                    piece.set_button_callback(lambda r=row, c=col: self.on_piece_clicked(r, c))
 
     def on_piece_clicked(self, row: int, col: int):
         if self.is_pause or self.is_win:
@@ -66,19 +60,13 @@ class GameView(arcade.View):
         if not self.board.is_valid_move(from_pos, to_pos):
             return
 
-        captured = self.board.move(from_pos, to_pos)
+        self.board.move(from_pos, to_pos)
 
         if self.board.is_king_threatened(self.turn):
             self.board.undo()
             return
-
-        if captured is not None:
-            self.visual.remove_piece(captured)
-
-        to_row, to_col = to_pos
-        piece = self.board.get(to_row, to_col)
-        piece.set_position_board(to_row, to_col)
-        piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
+        
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
         
         if self.board.is_promotion():
             if self.is_bot and self.bot.bot_color == (Color.WHITE if self.turn else Color.BLACK):

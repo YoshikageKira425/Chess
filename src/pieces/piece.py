@@ -1,5 +1,3 @@
-import arcade
-import arcade.gui
 from src.color_enum import Color
 
 class Piece():
