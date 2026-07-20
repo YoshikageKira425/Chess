@@ -39,7 +39,7 @@ class Board:
         to_row, to_col = to_pos
 
         piece = self.grid[from_row][from_col]
-        piece.set_indexes(to_row, to_col)
+        piece.set_position(to_row, to_col)
         
         captured = self.grid[to_row][to_col]
         
@@ -132,15 +132,15 @@ class Board:
         if action.original_piece:
             pawn = action.original_piece
             self.grid[from_row][from_col] = pawn
-            pawn.set_indexes(from_row, from_col)
+            pawn.set_position(from_row, from_col)
         else:
             self.grid[from_row][from_col] = action.piece
-            action.piece.set_indexes(from_row, from_col)
+            action.piece.set_position(from_row, from_col)
 
         self.grid[to_row][to_col] = action.captured
         
         if action.captured is not None:
-            action.captured.set_indexes(action.captured.row, action.captured.col)
+            action.captured.set_position(action.captured.row, action.captured.col)
         
         return action
 
@@ -155,7 +155,7 @@ class Board:
                 if piece is None:
                     continue
                 
-                if enemy_color == piece.color and piece.valid_move(self.grid, (row, col), king.get_indexes()):
+                if enemy_color == piece.color and piece.valid_move(self.grid, (row, col), king.get_postion()):
                     return True
         
         return False

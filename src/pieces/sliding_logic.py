@@ -30,6 +30,8 @@ def diagonal_path_clear(board:list[list[Piece]], from_pos:tuple, to_pos:tuple) -
 
     if abs(to_row - from_row) != abs(to_col - from_col):
         return False
+    if from_pos == to_pos:
+        return False
         
     row_step = 1 if from_row < to_row else -1
     col_step = 1 if from_col < to_col else -1

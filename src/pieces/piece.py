@@ -42,17 +42,17 @@ class Piece():
     def move_highlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         return []
     
-    def set_position(self, row: int, col: int):
-        self.set_indexes(row, col)
+    def set_position_board(self, row: int, col: int):
+        self.set_position(row, col)
         
         x = 175 + (col * 60) + 18
         y = 600 - (110 + (row * 60) - 24)
         self.piece_button.center_x = x
         self.piece_button.center_y = y
         
-    def set_indexes(self, row:int, col: int):
+    def set_position(self, row:int, col: int):
         self.row = row
         self.col = col
 
-    def get_indexes(self) -> tuple:
+    def get_postion(self) -> tuple:
         return (self.row, self.col)

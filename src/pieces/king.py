@@ -53,6 +53,9 @@ class King(Piece):
             if row < 0 or col < 0:
                 continue
             
+            if self._is_cell_being_attacked(board, (row, col)):
+                continue
+            
             piece = board[row][col]
             
             if piece is None:
@@ -61,3 +64,16 @@ class King(Piece):
                 highlights.append((row, col, HIGHLIGHT_CAPTURE))
         
         return highlights
+    
+    def _is_cell_being_attacked(self, board: list[list[Piece]], to_pos: tuple) -> bool:
+        for r in range(8):
+            for c in range(8):
+                piece = board[r][c]
+                    
+                if piece is None:
+                    continue
+                    
+                if self.color != piece.color and piece.valid_move(board, piece.get_postion(), to_pos):
+                    return True
+                
+        return False

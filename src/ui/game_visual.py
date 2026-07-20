@@ -32,11 +32,11 @@ class GameVisual():
             for col in range(8):
                 piece = board[row][col]
                 if piece is not None:
-                    piece.set_position(row, col) 
+                    piece.set_position_board(row, col) 
                     self._pieces_holder.add(piece.piece_button)
                     
     def add_piece(self, piece: Piece, row: int, col: int):
-        piece.set_position(row, col)
+        piece.set_position_board(row, col)
         self._pieces_holder.add(piece.piece_button)            
         
     def remove_piece(self, piece: Piece):

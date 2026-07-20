@@ -50,6 +50,10 @@ class GameView(arcade.View):
             return
 
         piece = self.board.get(row, col)
+        if piece is None:
+            print(self.board.grid)
+            return
+        
         if piece.color == Color.WHITE and not self.turn:
             return
         if piece.color == Color.BLACK and self.turn:
@@ -73,7 +77,7 @@ class GameView(arcade.View):
 
         to_row, to_col = to_pos
         piece = self.board.get(to_row, to_col)
-        piece.set_position(to_row, to_col)
+        piece.set_position_board(to_row, to_col)
         piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
         
         if self.board.is_promotion():
@@ -215,7 +219,7 @@ class GameView(arcade.View):
     def _undo_visual(self, action: Action):
         piece = action.piece
         from_row, from_col = action.from_pos
-        piece.set_position(from_row, from_col)
+        piece.set_position_board(from_row, from_col)
         piece.set_button_callback(lambda r=from_row, c=from_col: self.on_piece_clicked(r, c))
 
         if action.captured is not None:
