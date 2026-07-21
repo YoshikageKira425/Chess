@@ -9,10 +9,10 @@ DIFFICULTY = {
 }
 
 class Bot:
-    def __init__(self, board: Board, color:Color, difficulty: str = "easy"):
+    def __init__(self, board: Board, difficulty: str = "easy"):
         self.board = board
         self.max_depth = DIFFICULTY[difficulty]
-        self.bot_color = color
+        self.bot_color = ""
 
     def _search_move(self, depth: int=0, alpha: float = float('-inf'), beta: float = float('inf')) -> tuple:
         if depth == self.max_depth:

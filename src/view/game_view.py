@@ -13,26 +13,34 @@ class GameView(arcade.View):
     def __init__(self, is_bot:bool = True, difficulty: str = "easy"):
         super().__init__(background_color=arcade.color.GRAY)
 
-        self.selected = None
-        self.turn = True
-        self.is_pause = False
-        self.is_win = False
-
         self.board = Board()
 
         self.visual = GameVisual()
         self.ui = GameUI()
         
         self.ui.set_up_ui_buttons(self.unpause, self.restart, self.main_menu)
-        self.visual.update_board(self.board.grid, self.on_piece_clicked)
         
         self.is_bot = is_bot
-        self.your_color = Color.BLACK if random.random() > 0.5 else Color.WHITE
-        bot_color = Color.WHITE if self.your_color == Color.BLACK else Color.BLACK
-        self.bot = Bot(self.board, bot_color, difficulty)
-            
+        self.bot = Bot(self.board, difficulty)
+        
+        self.setup_game()    
+        
         if self.your_color == Color.BLACK and is_bot:
             self.bot_move()
+
+    def setup_game(self):
+        self.selected = None
+        self.turn = True
+        self.is_pause = False
+        self.is_win = False
+        
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
+        
+        self.ui.set_turn(self.turn)
+        
+        self.your_color = Color.BLACK if random.random() > 0.5 else Color.WHITE
+        bot_color = Color.WHITE if self.your_color == Color.BLACK else Color.BLACK
+        self.bot.bot_color = bot_color
 
     def on_piece_clicked(self, row: int, col: int):
         if self.is_pause or self.is_win:
@@ -140,14 +148,9 @@ class GameView(arcade.View):
         self.visual.set_highlights(highlights)
         
     def restart(self):
-        self.turn = True
+        self.setup_game()
         
-        self.your_color = Color.BLACK if random.random() > 0.5 else Color.WHITE
-        self.bot.bot_color = Color.WHITE if self.your_color == Color.BLACK else Color.BLACK
-        
-        self.ui.set_turn(self.turn)
         self.ui.remove_win()
-        self.is_win = False
 
         self.unpause()
         self.board.setup_board()

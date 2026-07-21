@@ -41,32 +41,28 @@ class Board:
     def get(self, row: int, col: int) -> Piece | None:
         return self.grid[row][col]
 
-    def move(self, from_pos: tuple, to_pos: tuple) -> Piece | None:
-        """Moves a piece and returns the captured piece if any."""
+    def move(self, from_pos: tuple, to_pos: tuple):
         from_row, from_col = from_pos
         to_row, to_col = to_pos
 
-        piece = self.grid[from_row][from_col]
-        piece.set_position(to_row, to_col)
+        piece = self.get(from_row, from_col)
         
         first_move = False
         if hasattr(piece, 'has_moved') and not piece.has_moved:
             piece.has_moved = True
             first_move = True
         
-        captured = self.grid[to_row][to_col]
+        captured = self.get(to_row, to_col)
         
-        en_passant_captured = None
         if isinstance(piece, Pawn) and captured is None and from_col != to_col:
-            en_passant_captured = self.grid[from_row][to_col]
+            captured = self.get(from_row, to_col)
             self.grid[from_row][to_col] = None
-            captured = en_passant_captured
             
         castled_rook = castled_rook_from = castled_rook_to = None
         if isinstance(piece, King) and abs(to_col - from_col) == 2:
             rook_from_col = 7 if to_col == 6 else 0
             rook_to_col = 5 if to_col == 6 else 3
-            rook = self.grid[from_row][rook_from_col]
+            rook = self.get(from_row, rook_from_col)
 
             castled_rook = rook
             castled_rook_from = (from_row, rook_from_col)
@@ -79,6 +75,7 @@ class Board:
         
         self.grid[to_row][to_col] = piece
         self.grid[from_row][from_col] = None
+        piece.set_position(to_row, to_col)
         
         self.actions.append(Action(
             from_pos=from_pos,
@@ -179,10 +176,15 @@ class Board:
             self.grid[from_row][from_col] = action.piece
             action.piece.set_position(from_row, from_col)
 
-        self.grid[to_row][to_col] = action.captured
-        
         if action.captured is not None:
-            action.captured.set_position(action.captured.row, action.captured.col)
+            cap_row, cap_col = action.captured.row, action.captured.col
+            self.grid[cap_row][cap_col] = action.captured
+            action.captured.set_position(cap_row, cap_col)
+            
+            if (cap_row, cap_col) != (to_row, to_col):
+                self.grid[to_row][to_col] = None
+        else:
+            self.grid[to_row][to_col] = None
         
         return action
 
