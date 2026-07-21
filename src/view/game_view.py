@@ -183,6 +183,7 @@ class GameView(arcade.View):
                 
             if self.is_bot:
                 self.board.undo()
+                self.turn = not self.turn
 
             self.visual.update_board(self.board.grid, self.on_piece_clicked)
 

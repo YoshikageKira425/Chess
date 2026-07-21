@@ -212,7 +212,7 @@ class Board:
     def is_checkmate(self, turn: bool) -> bool:
         color = Color.WHITE if turn else Color.BLACK
         
-        return len(self.get_legal_moves(color)) == 0
+        return len(self.get_legal_moves(color)) == 0 and self.is_king_threatened(turn)
 
     def is_within_bounds(self, row: int, col: int) -> bool:
         return 0 <= row <= 7 and 0 <= col <= 7

@@ -20,7 +20,7 @@ class Bot:
 
         opponent_color = Color.WHITE if self.bot_color == Color.BLACK else Color.BLACK
         current_turn = self.bot_color if depth % 2 == 0 else opponent_color
-        is_minimizing = current_turn == self.bot_color
+        is_minimizing = current_turn == opponent_color
 
         best_score = float('inf') if is_minimizing else float('-inf')
         best_from, best_to = None, None
