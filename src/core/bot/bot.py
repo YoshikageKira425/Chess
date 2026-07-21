@@ -49,6 +49,7 @@ class Bot:
         result = "Q"  
         alpha = float('-inf')
         beta = float('inf')
+        original_action = self.board.last_action()
         
         for promotion in ["Q", "N", "R", "B"]:
             self.board.promote(promotion)
@@ -56,6 +57,7 @@ class Bot:
             score, _, _ = self._search_move(alpha=alpha, beta=beta)
             
             self.board.undo()
+            self.board.actions.append(original_action)
             
             if score > best_score:
                 result = promotion

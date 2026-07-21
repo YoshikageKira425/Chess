@@ -117,8 +117,8 @@ class Board:
         color = last.piece.color
 
         classes = {"Q": Queen, "R": Rook, "B": Bishop, "N": Knight}
-        new_piece = classes[piece_type](f"{color}{piece_type}")
-        new_piece.set_indexes(row, col)
+        new_piece = classes[piece_type](Color(color))
+        new_piece.set_position(row, col)
 
         self.grid[row][col] = new_piece
         
