@@ -15,51 +15,78 @@ class Board:
         
     def setup_board(self):
         self.grid: list[list[Piece]] = [
-            [Rook("bR"), Knight("bN"), Bishop("bB"), Queen("bQ"), King("bK"), Bishop("bB"), Knight("bN"), Rook("bR")],
-            [Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP"), Pawn("bP")],
+            [Rook(Color.BLACK), Knight(Color.BLACK), Bishop(Color.BLACK), Queen(Color.BLACK), King(Color.BLACK), Bishop(Color.BLACK), Knight(Color.BLACK), Rook(Color.BLACK)],
+            [Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK), Pawn(Color.BLACK)],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP"), Pawn("wP")],
-            [Rook("wR"), Knight("wN"), Bishop("wB"), Queen("wQ"), King("wK"), Bishop("wB"), Knight("wN"), Rook("wR")],
+            [Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE), Pawn(Color.WHITE)],
+            [Rook(Color.WHITE), Knight(Color.WHITE), Bishop(Color.WHITE), Queen(Color.WHITE), King(Color.WHITE), Bishop(Color.WHITE), Knight(Color.WHITE), Rook(Color.WHITE)],
         ]
+        self._update_piece_positions()
         
         self.white_king = self.grid[7][4]
         self.black_king = self.grid[0][4]
         
         self.actions: list[Action] = []
+        
+    def _update_piece_positions(self):
+        for row, row_data in enumerate(self.grid):
+            for col, piece in enumerate(row_data):
+                if piece:
+                    piece.row = row
+                    piece.col = col
 
     def get(self, row: int, col: int) -> Piece | None:
         return self.grid[row][col]
 
-    def move(self, from_pos: tuple, to_pos: tuple) -> Piece | None:
-        """Moves a piece and returns the captured piece if any."""
+    def move(self, from_pos: tuple, to_pos: tuple):
         from_row, from_col = from_pos
         to_row, to_col = to_pos
 
-        piece = self.grid[from_row][from_col]
-        piece.set_indexes(to_row, to_col)
+        piece = self.get(from_row, from_col)
         
-        captured = self.grid[to_row][to_col]
+        first_move = False
+        if hasattr(piece, 'has_moved') and not piece.has_moved:
+            piece.has_moved = True
+            first_move = True
         
-        en_passant_captured = None
+        captured = self.get(to_row, to_col)
+        
         if isinstance(piece, Pawn) and captured is None and from_col != to_col:
-            en_passant_captured = self.grid[from_row][to_col]
+            captured = self.get(from_row, to_col)
             self.grid[from_row][to_col] = None
-            captured = en_passant_captured
+            
+        castled_rook = castled_rook_from = castled_rook_to = None
+        if isinstance(piece, King) and abs(to_col - from_col) == 2:
+            rook_from_col = 7 if to_col == 6 else 0
+            rook_to_col = 5 if to_col == 6 else 3
+            rook = self.get(from_row, rook_from_col)
+
+            castled_rook = rook
+            castled_rook_from = (from_row, rook_from_col)
+            castled_rook_to = (from_row, rook_to_col)
+
+            self.grid[from_row][rook_to_col] = rook
+            self.grid[from_row][rook_from_col] = None
+            rook.set_position(from_row, rook_to_col)
+            rook.has_moved = True
         
         self.grid[to_row][to_col] = piece
         self.grid[from_row][from_col] = None
+        piece.set_position(to_row, to_col)
         
         self.actions.append(Action(
             from_pos=from_pos,
             to_pos=to_pos,
             piece=piece,
-            captured=captured
+            captured=captured,
+            first_move=first_move,
+            castled_rook=castled_rook,
+            castled_rook_from=castled_rook_from,
+            castled_rook_to=castled_rook_to,
         ))
-
-        return captured
 
     def is_valid_move(self, from_pos: tuple, to_pos: tuple) -> bool:
         from_row, from_col = from_pos
@@ -90,10 +117,12 @@ class Board:
         color = last.piece.color
 
         classes = {"Q": Queen, "R": Rook, "B": Bishop, "N": Knight}
-        new_piece = classes[piece_type](f"{color}{piece_type}")
-        new_piece.set_indexes(row, col)
+        new_piece = classes[piece_type](Color(color))
+        new_piece.set_position(row, col)
 
         self.grid[row][col] = new_piece
+        
+        last.original_piece = last.piece
         last.piece = new_piece
         
     def get_legal_moves(self, color: str) -> list[tuple]:
@@ -126,11 +155,36 @@ class Board:
         action = self.actions.pop()
         from_row, from_col = action.from_pos
         to_row, to_col = action.to_pos
-
-        self.grid[from_row][from_col] = action.piece
-        action.piece.set_indexes(from_row, from_col)
         
-        self.grid[to_row][to_col] = action.captured
+        if action.first_move:
+            action.piece.has_moved = False
+
+        if action.castled_rook is not None:
+            rook = action.castled_rook
+            rf_row, rf_col = action.castled_rook_from
+            rt_row, rt_col = action.castled_rook_to
+            self.grid[rf_row][rf_col] = rook
+            self.grid[rt_row][rt_col] = None
+            rook.set_position(rf_row, rf_col)
+            rook.has_moved = False
+
+        if action.original_piece:
+            pawn = action.original_piece
+            self.grid[from_row][from_col] = pawn
+            pawn.set_position(from_row, from_col)
+        else:
+            self.grid[from_row][from_col] = action.piece
+            action.piece.set_position(from_row, from_col)
+
+        if action.captured is not None:
+            cap_row, cap_col = action.captured.row, action.captured.col
+            self.grid[cap_row][cap_col] = action.captured
+            action.captured.set_position(cap_row, cap_col)
+            
+            if (cap_row, cap_col) != (to_row, to_col):
+                self.grid[to_row][to_col] = None
+        else:
+            self.grid[to_row][to_col] = None
         
         return action
 
@@ -145,36 +199,20 @@ class Board:
                 if piece is None:
                     continue
                 
-                if enemy_color == piece.color and piece.valid_move(self.grid, (row, col), king.get_indexes()):
+                if enemy_color == piece.color and piece.valid_move(self.grid, (row, col), king.get_postion()):
                     return True
         
         return False
     
+    def is_stalemate(self, turn: bool) -> bool:
+        color = Color.WHITE if turn else Color.BLACK
+        
+        return not self.is_king_threatened(turn) and len(self.get_legal_moves(color)) == 0
+    
     def is_checkmate(self, turn: bool) -> bool:
-        if not self.is_king_threatened(turn):
-            return False
-
-        friendly_color = Color.WHITE if turn else Color.BLACK
-
-        for row in range(8):
-            for col in range(8):
-                piece = self.grid[row][col]
-                if piece is None or piece.color != friendly_color:
-                    continue
-
-                for to_row in range(8):
-                    for to_col in range(8):
-                        if not self.is_valid_move((row, col), (to_row, to_col)):
-                            continue
-
-                        self.move((row, col), (to_row, to_col))
-                        still_threatened = self.is_king_threatened(turn)
-                        self.undo()
-
-                        if not still_threatened:
-                            return False
-
-        return True
+        color = Color.WHITE if turn else Color.BLACK
+        
+        return len(self.get_legal_moves(color)) == 0 and self.is_king_threatened(turn)
 
     def is_within_bounds(self, row: int, col: int) -> bool:
         return 0 <= row <= 7 and 0 <= col <= 7

@@ -1,4 +1,5 @@
 import arcade
+import random
 from src.ui.game_visual import GameVisual
 from src.ui.game_ui import GameUI
 from src.core.board import Board
@@ -6,33 +7,40 @@ from src.core.bot.bot import Bot
 from ..constants import HIGHLIGHT_SELECTED, HIGHLIGHT_CAPTURE, BOARD_OFFSET_X, BOARD_OFFSET_Y
 from ..core.bot.evaluator import evaluate
 from ..color_enum import Color
+from ..action import Action
 
 class GameView(arcade.View):
     def __init__(self, is_bot:bool = True, difficulty: str = "easy"):
         super().__init__(background_color=arcade.color.GRAY)
 
-        self.is_bot = is_bot
+        self.board = Board()
 
+        self.visual = GameVisual()
+        self.ui = GameUI()
+        
+        self.ui.set_up_ui_buttons(self.unpause, self.restart, self.main_menu)
+        
+        self.is_bot = is_bot
+        self.bot = Bot(self.board, difficulty)
+        
+        self.setup_game()    
+        
+        if self.your_color == Color.BLACK and is_bot:
+            self.bot_move()
+
+    def setup_game(self):
         self.selected = None
         self.turn = True
         self.is_pause = False
         self.is_win = False
-
-        self.board = Board()
-        self.setup_board()
         
-        self.bot = Bot(self.board, difficulty)
-
-        self.visual = GameVisual(self.board.grid)
-        self.ui = GameUI()
-        self.ui.set_up_ui_buttons(self.unpause, self.restart, self.main_menu)
-
-    def setup_board(self):
-        for row in range(8):
-            for col in range(8):
-                piece = self.board.get(row, col)
-                if piece is not None:
-                    piece.set_button_callback(lambda r=row, c=col: self.on_piece_clicked(r, c))
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
+        
+        self.ui.set_turn(self.turn)
+        
+        self.your_color = Color.BLACK if random.random() > 0.5 else Color.WHITE
+        bot_color = Color.WHITE if self.your_color == Color.BLACK else Color.BLACK
+        self.bot.bot_color = bot_color
 
     def on_piece_clicked(self, row: int, col: int):
         if self.is_pause or self.is_win:
@@ -44,6 +52,9 @@ class GameView(arcade.View):
             return
 
         piece = self.board.get(row, col)
+        if piece is None:
+            return
+        
         if piece.color == Color.WHITE and not self.turn:
             return
         if piece.color == Color.BLACK and self.turn:
@@ -56,23 +67,18 @@ class GameView(arcade.View):
         if not self.board.is_valid_move(from_pos, to_pos):
             return
 
-        captured = self.board.move(from_pos, to_pos)
+        self.board.move(from_pos, to_pos)
 
         if self.board.is_king_threatened(self.turn):
             self.board.undo()
             return
-
-        if captured is not None:
-            self.visual.remove_piece(captured)
-
-        to_row, to_col = to_pos
-        piece = self.board.get(to_row, to_col)
-        piece.set_position(to_row, to_col)
-        piece.set_button_callback(lambda r=to_row, c=to_col: self.on_piece_clicked(r, c))
-        piece.pieced_moved()
         
         if self.board.is_promotion():
-            self.ui.show_promotion(self._on_promotion)
+            if self.is_bot and self.bot.bot_color == (Color.WHITE if self.turn else Color.BLACK):
+                self._on_promotion(self.bot.chose_promotion())
+            else:
+                self.ui.show_promotion(self._on_promotion)
+                
             return
 
         self.finish_turn()
@@ -81,22 +87,20 @@ class GameView(arcade.View):
         last = self.board.last_action()
         to_row, to_col = last.to_pos
 
-        old_piece = self.board.get(to_row, to_col)
-        self.visual.remove_piece(old_piece)
+        self.board.get(to_row, to_col)
 
         self.board.promote(piece_type)
-
-        new_piece = self.board.get(to_row, to_col)
-        self.visual.add_piece(new_piece, to_row, to_col)
-        new_piece.set_button_callback(
-            lambda r=to_row, c=to_col: self.on_piece_clicked(r, c)
-        )
 
         self.finish_turn()    
     
     def finish_turn(self):
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
         score = evaluate(self.board)
         self.ui.update_eval(score)
+        
+        if self.board.is_stalemate(not self.turn):
+            self._stalemate()
+            return
         
         if self.board.is_checkmate(not self.turn):
             self._win()
@@ -105,14 +109,24 @@ class GameView(arcade.View):
         self.turn = not self.turn
         self.ui.set_turn(self.turn)
 
-        if not self.turn and self.is_bot:
-            from_pos, to_pos = self.bot.get_move()
-            self.move_piece(from_pos, to_pos)
+        if self.is_bot and self.bot.bot_color == (Color.WHITE if self.turn else Color.BLACK):
+            self.bot_move()
         
     def _win(self):
         self.is_win = True
         self.stop_moving()
         self.ui.win(self.turn)
+        
+    def _stalemate(self):
+        self.is_win = True
+        self.stop_moving()
+        self.ui.stalemate()
+
+    def bot_move(self):
+        from_pos, to_pos = self.bot.get_move()
+        
+        if from_pos and to_pos:
+            self.move_piece(from_pos, to_pos)
 
     def stop_moving(self):
         self.visual.clear_highlights()
@@ -124,7 +138,7 @@ class GameView(arcade.View):
         
         last_action = self.board.last_action()
         
-        highlights.extend(self.board.get(row, col).move_hightlight(self.board.grid, self.selected, last_action))
+        highlights.extend(self.board.get(row, col).move_highlight(self.board.grid, self.selected, last_action))
         
         if self.board.is_king_threatened(self.turn):
             king = self.board.white_king if self.turn else self.board.black_king
@@ -134,16 +148,17 @@ class GameView(arcade.View):
         self.visual.set_highlights(highlights)
         
     def restart(self):
-        self.turn = True
-        self.ui.set_turn(self.turn)
+        self.setup_game()
+        
         self.ui.remove_win()
-        self.is_win = False
 
         self.unpause()
         self.board.setup_board()
-
-        self.setup_board()
-        self.visual.set_board(self.board.grid)
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
+        self.stop_moving()
+        
+        if self.your_color == Color.BLACK and self.is_bot:
+            self.bot_move()
     
     def main_menu(self):
         from src.view.main_menu_view import MainMenuView
@@ -155,13 +170,28 @@ class GameView(arcade.View):
         self.ui.unpause()
 
     def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.TAB and not self.is_win:
+        if symbol in [arcade.key.TAB, arcade.key.ESCAPE, arcade.key.P] and not self.is_win:
             self.is_pause = not self.is_pause
 
             if self.is_pause:
                 self.ui.pause()
             else:
                 self.ui.unpause()
+                
+        if symbol == arcade.key.SPACE and not self.is_win and self.board.actions:
+            self.board.undo()
+                
+            if self.is_bot:
+                self.board.undo()
+                self.turn = not self.turn
+
+            self.visual.update_board(self.board.grid, self.on_piece_clicked)
+
+            score = evaluate(self.board)
+            self.ui.update_eval(score)
+            self.turn = not self.turn  
+            self.ui.set_turn(self.turn)
+            self.stop_moving()
 
         return super().on_key_press(symbol, modifiers)
 

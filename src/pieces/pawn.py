@@ -1,14 +1,16 @@
 from .piece import Piece
 from ..constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
+from ..color_enum import Color
+from ..action import Action
 
 class Pawn(Piece):
     def __init__(self, piece):
         super().__init__(piece)
 
-    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action=None) -> bool:
+    def valid_move(self, board: list[list[Piece]], from_pos: tuple, to_pos: tuple, last_action:Action=None) -> bool:
         from_row, from_col = from_pos
         to_row, to_col = to_pos
-        direction = -1 if self.color == "w" else 1
+        direction = -1 if self.color == Color.WHITE else 1
 
         if (
             to_col == from_col
@@ -18,7 +20,7 @@ class Pawn(Piece):
             return True
 
         if (
-            self.has_pawn_moved()
+            self._has_pawn_moved()
             and to_col == from_col
             and to_row == from_row + direction * 2
             and board[from_row + direction][from_col] is None
@@ -39,13 +41,13 @@ class Pawn(Piece):
 
         return False
 
-    def _is_en_passant(self, from_pos, to_pos, last_action) -> bool:
+    def _is_en_passant(self, from_pos:tuple, to_pos:tuple, last_action:Action) -> bool:
         if last_action is None:
             return False
 
         from_row, from_col = from_pos
         to_row, to_col = to_pos
-        direction = -1 if self.color == "w" else 1
+        direction = -1 if self.color == Color.WHITE else 1
 
         last_piece = last_action.piece
         last_from = last_action.from_pos
@@ -65,10 +67,10 @@ class Pawn(Piece):
 
         return True
 
-    def move_hightlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
+    def move_highlight(self, board: list[list[Piece]], from_pos: tuple, last_action=None) -> list[tuple]:
         from_row, from_col = from_pos
         highlights = []
-        direction = -1 if self.color == "w" else 1
+        direction = -1 if self.color == Color.WHITE else 1
 
         row = from_row + direction
 
@@ -87,7 +89,7 @@ class Pawn(Piece):
         else:
             return highlights
 
-        if self.has_pawn_moved() and board[from_row + direction * 2][from_col] is None:
+        if self._has_pawn_moved() and board[from_row + direction * 2][from_col] is None:
             highlights.append((from_row + direction * 2, from_col, HIGHLIGHT_MOVE))
 
         return highlights
@@ -100,5 +102,5 @@ class Pawn(Piece):
             and board[row][col].color != self.color
         )
 
-    def has_pawn_moved(self) -> bool:
-        return (self.row == 6 and self.color == "w") or (self.row == 1 and self.color == "b")
+    def _has_pawn_moved(self) -> bool:
+        return (self.row == 6 and self.color == Color.WHITE) or (self.row == 1 and self.color == Color.BLACK)
