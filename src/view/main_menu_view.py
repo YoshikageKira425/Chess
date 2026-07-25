@@ -105,7 +105,7 @@ class MainMenuView(arcade.View):
         self.manager.enable()
 
     def play(self, is_bot: bool, difficulty: str):
-        self.window.show_view(GameView(is_bot, difficulty))
+        self.window.show_view(GameView())
 
     def quit(self):
         arcade.exit()

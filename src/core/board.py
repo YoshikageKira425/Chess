@@ -6,8 +6,8 @@ from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
 from src.pieces.king import King
 from src.action import Action
-from enum.color_enum import Color
-from enum.pieces_enum import Pieces
+from src.enum.color_enum import Color
+from src.enum.pieces_enum import Pieces
 
 
 class Board:
@@ -141,7 +141,7 @@ class Board:
                             continue
 
                         self.move((row, col), (to_row, to_col))
-                        in_check = self.is_king_threatened(color == Color.WHITE)
+                        in_check = self.is_king_threatened(color)
                         self.undo()
 
                         if not in_check:
@@ -191,7 +191,7 @@ class Board:
 
     def is_king_threatened(self, color: Color) -> bool:
         enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
-        king = self.white_king if color == Color.WHITE else self.black_king
+        king = self.white_king if enemy_color == Color.BLACK else self.black_king
         
         for row in range(8):
             for col in range(8):
@@ -209,7 +209,7 @@ class Board:
         return not self.is_king_threatened(color) and len(self.get_legal_moves(color)) == 0
     
     def is_checkmate(self, color: Color) -> bool:
-        return len(self.get_legal_moves(color)) == 0 and self.is_king_threatened(color)
+        return self.is_king_threatened(color) and len(self.get_legal_moves(color)) == 0
 
     def is_within_bounds(self, row: int, col: int) -> bool:
         return 0 <= row <= 7 and 0 <= col <= 7

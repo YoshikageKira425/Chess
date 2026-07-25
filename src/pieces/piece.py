@@ -1,4 +1,4 @@
-from enum.color_enum import Color
+from src.enum.color_enum import Color
 
 class Piece():
     def __init__(self, color: Color):
