@@ -1,6 +1,7 @@
 from src.core.board import Board
 from .evaluator import evaluate
-from src.color_enum import Color
+from enum.color_enum import Color
+from enum.pieces_enum import Pieces
 
 DIFFICULTY = {
     "easy":   1,
@@ -51,7 +52,7 @@ class Bot:
         beta = float('inf')
         original_action = self.board.last_action()
         
-        for promotion in ["Q", "N", "R", "B"]:
+        for promotion in [Pieces.QUEEN, Pieces.KNIGHT, Pieces.ROOK, Pieces.BISHOP]:
             self.board.promote(promotion)
             
             score, _, _ = self._search_move(alpha=alpha, beta=beta)

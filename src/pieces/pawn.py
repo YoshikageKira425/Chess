@@ -1,6 +1,6 @@
 from .piece import Piece
 from ..constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
-from ..color_enum import Color
+from ..enum.color_enum import Color
 from ..action import Action
 
 class Pawn(Piece):

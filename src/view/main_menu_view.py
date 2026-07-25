@@ -1,6 +1,6 @@
 import arcade
 import arcade.gui
-from .game_view import GameView
+from .base_chess_view import GameView
 
 class MainMenuView(arcade.View):
     def __init__(self):

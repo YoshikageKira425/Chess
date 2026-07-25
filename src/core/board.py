@@ -6,7 +6,8 @@ from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
 from src.pieces.king import King
 from src.action import Action
-from src.color_enum import Color
+from enum.color_enum import Color
+from enum.pieces_enum import Pieces
 
 
 class Board:
@@ -110,13 +111,13 @@ class Board:
             (piece.color == Color.BLACK and piece.row == 7)
         )
 
-    def promote(self, piece_type: str):
+    def promote(self, piece_type: Pieces):
         """Replace the pawn with the chosen piece. Call after is_promotion()."""
         last = self.last_action()
         row, col = last.to_pos
         color = last.piece.color
 
-        classes = {"Q": Queen, "R": Rook, "B": Bishop, "N": Knight}
+        classes = {Pieces.QUEEN: Queen, Pieces.ROOK: Rook, Pieces.BISHOP: Bishop, Pieces.KNIGHT: Knight}
         new_piece = classes[piece_type](Color(color))
         new_piece.set_position(row, col)
 
@@ -125,7 +126,7 @@ class Board:
         last.original_piece = last.piece
         last.piece = new_piece
         
-    def get_legal_moves(self, color: str) -> list[tuple]:
+    def get_legal_moves(self, color: Color) -> list[tuple]:
         legal = []
 
         for row in range(8):
@@ -188,9 +189,9 @@ class Board:
         
         return action
 
-    def is_king_threatened(self, turn: bool) -> bool:
-        enemy_color = Color.BLACK if turn else Color.WHITE
-        king = self.white_king if turn else self.black_king
+    def is_king_threatened(self, color: Color) -> bool:
+        enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
+        king = self.white_king if color == Color.WHITE else self.black_king
         
         for row in range(8):
             for col in range(8):
@@ -204,15 +205,11 @@ class Board:
         
         return False
     
-    def is_stalemate(self, turn: bool) -> bool:
-        color = Color.WHITE if turn else Color.BLACK
-        
-        return not self.is_king_threatened(turn) and len(self.get_legal_moves(color)) == 0
+    def is_stalemate(self, color: Color) -> bool:
+        return not self.is_king_threatened(color) and len(self.get_legal_moves(color)) == 0
     
-    def is_checkmate(self, turn: bool) -> bool:
-        color = Color.WHITE if turn else Color.BLACK
-        
-        return len(self.get_legal_moves(color)) == 0 and self.is_king_threatened(turn)
+    def is_checkmate(self, color: Color) -> bool:
+        return len(self.get_legal_moves(color)) == 0 and self.is_king_threatened(color)
 
     def is_within_bounds(self, row: int, col: int) -> bool:
         return 0 <= row <= 7 and 0 <= col <= 7

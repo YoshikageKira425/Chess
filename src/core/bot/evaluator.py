@@ -6,7 +6,7 @@ from src.pieces.bishop import Bishop
 from src.pieces.queen import Queen
 from src.pieces.king import King
 from src.core.board import Board
-from src.color_enum import Color
+from enum.color_enum import Color
 
 MATERIAL_SCORE = {Pawn: 1, Knight: 3, Rook:5, Bishop: 3, Queen: 9}
 
