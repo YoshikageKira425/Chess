@@ -22,7 +22,7 @@ class BaseChess(arcade.View):
         self.turn = Color.WHITE
         self.is_match_finished = False
         
-        self.updated_visuals(evaluate(self.board))
+        self.updated_visuals(0)
 
     def on_piece_clicked(self, row: int, col: int):
         if self.is_match_finished:
