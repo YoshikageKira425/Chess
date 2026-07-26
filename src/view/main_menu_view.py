@@ -1,6 +1,8 @@
 import arcade
 import arcade.gui
-from .base_chess_view import BaseChess
+from .games.local_chess import LocalChess
+from .games.bot_chess import BotChess
+from src.enum.difficulty_enum import Difficulty
 
 class MainMenuView(arcade.View):
     def __init__(self):
@@ -47,7 +49,7 @@ class MainMenuView(arcade.View):
     def _set_up_main_ui(self):
         vs_bot_button  = arcade.gui.UIFlatButton(text="VS BOT",    x=300, y=340, width=200, style=self.style)
         vs_player_button = arcade.gui.UIFlatButton(text="VS PLAYER", x=300, y=270, width=200, style=self.style)
-        quit_button    = arcade.gui.UIFlatButton(text="QUIT",      x=300, y=200, width=200, style=self.style)
+        quit_button = arcade.gui.UIFlatButton(text="QUIT",      x=300, y=200, width=200, style=self.style)
 
         self._main_widget.add(vs_bot_button)
         self._main_widget.add(vs_player_button)
@@ -60,7 +62,7 @@ class MainMenuView(arcade.View):
 
         @vs_player_button.event("on_click")
         def on_vs_player(*args):
-            self.play(is_bot=False, difficulty="easy")
+            self.play(is_bot=False)
 
         @quit_button.event("on_click")
         def on_quit(*args):
@@ -71,10 +73,10 @@ class MainMenuView(arcade.View):
             text="DIFFICULTY", font_size=55, font_name="ArcadeClassic", y=400, x=190
         ))
 
-        easy_button   = arcade.gui.UIFlatButton(text="EASY",   x=300, y=330, width=200, style=self.style)
+        easy_button = arcade.gui.UIFlatButton(text="EASY",   x=300, y=330, width=200, style=self.style)
         medium_button = arcade.gui.UIFlatButton(text="MEDIUM",  x=300, y=260, width=200, style=self.style)
-        hard_button   = arcade.gui.UIFlatButton(text="HARD",   x=300, y=190, width=200, style=self.style)
-        back_button   = arcade.gui.UIFlatButton(text="BACK",   x=300, y=120, width=200, style=self.style)
+        hard_button = arcade.gui.UIFlatButton(text="HARD",   x=300, y=190, width=200, style=self.style)
+        back_button = arcade.gui.UIFlatButton(text="BACK",   x=300, y=120, width=200, style=self.style)
 
         self._difficulty_widget.add(easy_button)
         self._difficulty_widget.add(medium_button)
@@ -83,15 +85,15 @@ class MainMenuView(arcade.View):
 
         @easy_button.event("on_click")
         def on_easy(*args):
-            self.play(is_bot=True, difficulty="easy")
+            self.play(is_bot=True, difficulty=Difficulty.EASY)
 
         @medium_button.event("on_click")
         def on_medium(*args):
-            self.play(is_bot=True, difficulty="medium")
+            self.play(is_bot=True, difficulty=Difficulty.MEDIUM)
 
         @hard_button.event("on_click")
         def on_hard(*args):
-            self.play(is_bot=True, difficulty="hard")
+            self.play(is_bot=True, difficulty=Difficulty.HARD)
 
         @back_button.event("on_click")
         def on_back(*args):
@@ -104,8 +106,11 @@ class MainMenuView(arcade.View):
     def on_show_view(self):
         self.manager.enable()
 
-    def play(self, is_bot: bool, difficulty: str):
-        self.window.show_view(BaseChess())
+    def play(self, is_bot: bool, difficulty: Difficulty | None = None):
+        if is_bot == True:
+            self.window.show_view(BotChess(difficulty))
+        else:
+            self.window.show_view(LocalChess())
 
     def quit(self):
         arcade.exit()

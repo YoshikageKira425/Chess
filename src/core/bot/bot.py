@@ -1,19 +1,20 @@
 from src.core.board import Board
 from .evaluator import evaluate
-from enum.color_enum import Color
-from enum.pieces_enum import Pieces
+from src.enum.color_enum import Color
+from src.enum.pieces_enum import Pieces
+from src.enum.difficulty_enum import Difficulty
 
 DIFFICULTY = {
-    "easy":   1,
-    "medium": 2,
-    "hard":   3,
+    Difficulty.EASY: 1,
+    Difficulty.MEDIUM: 2,
+    Difficulty.HARD: 3,
 }
 
 class Bot:
-    def __init__(self, board: Board, difficulty: str = "easy"):
+    def __init__(self, board: Board, difficulty: Difficulty):
         self.board = board
         self.max_depth = DIFFICULTY[difficulty]
-        self.bot_color = ""
+        self.bot_color = Color.BLACK
 
     def _search_move(self, depth: int=0, alpha: float = float('-inf'), beta: float = float('inf')) -> tuple:
         if depth == self.max_depth:
