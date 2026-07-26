@@ -1,6 +1,6 @@
 import arcade
 import arcade.gui
-from .base_chess_view import GameView
+from .base_chess_view import BaseChess
 
 class MainMenuView(arcade.View):
     def __init__(self):
@@ -105,7 +105,7 @@ class MainMenuView(arcade.View):
         self.manager.enable()
 
     def play(self, is_bot: bool, difficulty: str):
-        self.window.show_view(GameView())
+        self.window.show_view(BaseChess())
 
     def quit(self):
         arcade.exit()

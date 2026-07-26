@@ -5,7 +5,7 @@ from ..constants import HIGHLIGHT_SELECTED, HIGHLIGHT_CAPTURE, BOARD_OFFSET_X, B
 from ..core.bot.evaluator import evaluate
 from ..enum.color_enum import Color
 
-class GameView(arcade.View):
+class BaseChess(arcade.View):
     def __init__(self):
         super().__init__(background_color=arcade.color.GRAY)
 
