@@ -8,6 +8,7 @@ from src.pieces.queen import Queen
 from src.pieces.king import King
 from ..pieces.piece import Piece
 from ..constants import SQUARE_SIZE, BOARD_OFFSET_X, BOARD_OFFSET_Y
+from src.enum.pieces_enum import Pieces
 
 textures = {
     "wp": arcade.load_texture("assets/sprites/white_pieces/pawn_white.png"),
@@ -24,7 +25,7 @@ textures = {
     "bk": arcade.load_texture("assets/sprites/black_pieces/king_black.png"),
 }
 
-class GameVisual():
+class ChessVisual():
     def __init__(self):
         self._manager = arcade.gui.UIManager()
         self._manager.enable()
@@ -52,9 +53,9 @@ class GameVisual():
                     self._add_piece(piece, row, col, click_callback)
                     
     def _add_piece(self, piece: Piece, row: int, col: int, click_callback):
-        types = {Pawn: "p", Knight: "n", Rook:"r", Bishop: "b", Queen: "q", King: "k"}
+        types = {Pawn: Pieces.PAWN, Knight: Pieces.KNIGHT, Rook:Pieces.ROOK, Bishop: Pieces.BISHOP, Queen: Pieces.QUEEN, King: Pieces.KING}
         
-        texture = textures[f"{piece.color}{types.get(type(piece), "p")}"]
+        texture = textures[f"{piece.color}{types.get(type(piece), "p").lower()}"]
         x = 175 + (col * 60)
         y = 600 - (110 + (row * 60))
         

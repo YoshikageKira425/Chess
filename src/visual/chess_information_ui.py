@@ -28,7 +28,8 @@ class ChessInformationUi:
         self._set_up_promotion_ui()
         self._set_up_eval_bar()
 
-        self.update_eval(0)
+        self.set_evaluator(0)
+        self.set_turn(Color.WHITE)
 
     def _set_up_eval_bar(self):
         self._eval_white = arcade.gui.UISpace(
@@ -42,7 +43,7 @@ class ChessInformationUi:
         self._manager.add(self._eval_black)
         self._manager.add(self._eval_white)
 
-    def update_eval(self, score: float):
+    def set_evaluator(self, score: float):
         clamped = max(-MAX_SCORE, min(MAX_SCORE, score))
         white_width = int((BAR_WIDTH / 2) + (clamped /
                           MAX_SCORE) * (BAR_WIDTH / 2 * 0.8))

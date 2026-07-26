@@ -1,5 +1,6 @@
 import arcade
-from src.ui.game_visual import GameVisual
+from src.visual.chess_visual import ChessVisual
+from src.visual.chess_information_ui import ChessInformationUi
 from src.core.board import Board
 from ..constants import HIGHLIGHT_SELECTED, HIGHLIGHT_CAPTURE, BOARD_OFFSET_X, BOARD_OFFSET_Y
 from ..core.bot.evaluator import evaluate
@@ -11,7 +12,8 @@ class BaseChess(arcade.View):
 
         self.board = Board()
 
-        self.visual = GameVisual()
+        self.visual = ChessVisual()
+        self.information = ChessInformationUi()
         
         self.setup_game()    
 
@@ -19,7 +21,6 @@ class BaseChess(arcade.View):
         self.selected = None
         self.turn = Color.WHITE
         self.is_match_finished = False
-        self.score = 0
         
         self.visual.update_board(self.board.grid, self.on_piece_clicked)
 
@@ -63,8 +64,11 @@ class BaseChess(arcade.View):
     
     def finish_turn(self):
         self.visual.update_board(self.board.grid, self.on_piece_clicked)
-        self.score = evaluate(self.board)
+        
         self.turn = Color.WHITE if self.turn == Color.BLACK else Color.BLACK
+        self.information.set_turn(self.turn)
+        
+        self.information.set_evaluator(evaluate(self.board))
         
         if self.board.is_stalemate(self.turn):
             self.stalemate()
@@ -118,4 +122,6 @@ class BaseChess(arcade.View):
 
     def on_draw(self):
         self.clear()
+        
         self.visual.draw()
+        self.information.draw()
