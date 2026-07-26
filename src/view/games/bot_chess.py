@@ -14,6 +14,10 @@ class BotChess(LocalChess):
         
         if self.bot.bot_color == self.turn:
             self.bot_move()
+            
+    def undo(self):
+        super().undo()
+        super().undo()
         
     def bot_move(self):
         from_pos, to_pos = self.bot.get_move()

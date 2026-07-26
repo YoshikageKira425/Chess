@@ -2,6 +2,7 @@ import arcade
 from ..base_chess_view import BaseChess
 from src.visual.pause_ui import PauseUi
 from src.core.bot.evaluator import evaluate
+from src.enum.color_enum import Color
 
 class LocalChess(BaseChess):
     def __init__(self):
@@ -30,6 +31,14 @@ class LocalChess(BaseChess):
     def on_key_press(self, symbol, modifiers):
         if symbol in [arcade.key.TAB, arcade.key.ESCAPE, arcade.key.P] and not self.is_match_finished:
             self.pause()
+            
+        if symbol == arcade.key.SPACE and not self.is_match_finished and self.board.actions:
+            self.undo()
+    
+    def undo(self):
+        self.board.undo()
+        self.turn = Color.WHITE if self.turn == Color.BLACK else Color.BLACK
+        self.updated_visuals(evaluate(self.board))
     
     def pause(self):
         self._is_paused = not self._is_paused

@@ -42,6 +42,11 @@ class PauseUi():
     def pause(self, value:bool):
         self._is_paused = value
         
+        if value:
+            self._pause_manager.enable()
+        else:
+            self._pause_manager.disable()
+        
     def draw(self):
         if self._is_paused:
             self._pause_manager.draw()
