@@ -22,7 +22,7 @@ class BaseChess(arcade.View):
         self.turn = Color.WHITE
         self.is_match_finished = False
         
-        self.visual.update_board(self.board.grid, self.on_piece_clicked)
+        self.updated_visuals(evaluate(self.board))
 
     def on_piece_clicked(self, row: int, col: int):
         if self.is_match_finished:
@@ -63,12 +63,8 @@ class BaseChess(arcade.View):
         pass   
     
     def finish_turn(self):
-        self.visual.update_board(self.board.grid, self.on_piece_clicked)
-        
         self.turn = Color.WHITE if self.turn == Color.BLACK else Color.BLACK
-        self.information.set_turn(self.turn)
-        
-        self.information.set_evaluator(evaluate(self.board))
+        self.updated_visuals(evaluate(self.board))
         
         if self.board.is_stalemate(self.turn):
             self.stalemate()
@@ -87,6 +83,11 @@ class BaseChess(arcade.View):
         self.is_match_finished = True
         self._stop_moving()
         print("STALEMATE")
+        
+    def updated_visuals(self, evaluate_value: float):
+        self.information.set_turn(self.turn)
+        self.information.set_evaluator(evaluate_value)
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
 
     def _stop_moving(self):
         self.visual.clear_highlights()
