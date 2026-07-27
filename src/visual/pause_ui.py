@@ -5,7 +5,7 @@ from src.constants import BUTTTON_STYLE
 class PauseUi():
     def __init__(self):
         self._pause_manager = arcade.gui.UIManager()
-        self._pause_manager.enable()
+        self._pause_manager.disable()
         
         self._set_up_pause_ui()
                 
