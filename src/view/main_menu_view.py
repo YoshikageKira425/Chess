@@ -2,6 +2,7 @@ import arcade
 import arcade.gui
 from .games.local_chess import LocalChess
 from .games.bot_chess import BotChess
+from .multiplayer_menu_view import MultiplayerMenuView
 from src.enum.difficulty_enum import Difficulty
 from src.constants import BUTTTON_STYLE
 
@@ -35,10 +36,12 @@ class MainMenuView(arcade.View):
     def _set_up_main_ui(self):
         vs_bot_button  = arcade.gui.UIFlatButton(text="VS BOT", x=300, y=340, width=200, style=BUTTTON_STYLE)
         vs_player_button = arcade.gui.UIFlatButton(text="VS PLAYER", x=300, y=270, width=200, style=BUTTTON_STYLE)
-        quit_button = arcade.gui.UIFlatButton(text="QUIT", x=300, y=200, width=200, style=BUTTTON_STYLE)
+        multiplayer_button = arcade.gui.UIFlatButton(text="MULTIPLAYER", x=215, y=200, width=370, style=BUTTTON_STYLE)
+        quit_button = arcade.gui.UIFlatButton(text="QUIT", x=300, y=130, width=200, style=BUTTTON_STYLE)
 
         self._main_widget.add(vs_bot_button)
         self._main_widget.add(vs_player_button)
+        self._main_widget.add(multiplayer_button)
         self._main_widget.add(quit_button)
 
         @vs_bot_button.event("on_click")
@@ -49,6 +52,10 @@ class MainMenuView(arcade.View):
         @vs_player_button.event("on_click")
         def on_vs_player(*args):
             self.play(is_bot=False)
+            
+        @multiplayer_button.event("on_click")
+        def on_multiplayer(*args):
+            pass
 
         @quit_button.event("on_click")
         def on_quit(*args):
