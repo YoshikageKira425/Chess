@@ -1,6 +1,7 @@
 import arcade
 from ..base_chess_view import BaseChess
 from src.visual.pause_ui import PauseUi
+from src.visual.end_screen_ui import EndScreenUi
 from src.core.bot.evaluator import evaluate
 from src.enum.color_enum import Color
 
@@ -9,7 +10,10 @@ class LocalChess(BaseChess):
         super().__init__()
         
         self._pause_ui = PauseUi()
+        self._end_screen_ui = EndScreenUi()
+        
         self._pause_ui.set_up_ui_buttons(self.pause, self.restart, self.main_menu)
+        self._end_screen_ui.set_up_ui_buttons(self.restart, self.main_menu)
         
     def setup_game(self):
         self._is_paused = False
@@ -35,6 +39,14 @@ class LocalChess(BaseChess):
         if symbol == arcade.key.SPACE and not self.is_match_finished and self.board.actions:
             self.undo()
     
+    def win(self):
+        self._end_screen_ui.show_end_screen(self.turn)
+        return super().win()
+    
+    def stalemate(self):
+        self._end_screen_ui.show_end_screen()
+        return super().stalemate()
+    
     def undo(self):
         self.board.undo()
         self.turn = Color.WHITE if self.turn == Color.BLACK else Color.BLACK
@@ -46,6 +58,8 @@ class LocalChess(BaseChess):
         
     def restart(self):
         self.pause()
+        self._end_screen_ui.hide_end_screen()
+        
         self.board.setup_board()
         self.setup_game()
         self.visual.clear_highlights()
@@ -59,3 +73,4 @@ class LocalChess(BaseChess):
         super().on_draw()
         
         self._pause_ui.draw()
+        self._end_screen_ui.draw()
