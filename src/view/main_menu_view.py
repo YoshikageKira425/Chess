@@ -3,6 +3,7 @@ import arcade.gui
 from .games.local_chess import LocalChess
 from .games.bot_chess import BotChess
 from src.enum.difficulty_enum import Difficulty
+from src.constants import BUTTTON_STYLE
 
 class MainMenuView(arcade.View):
     def __init__(self):
@@ -13,21 +14,6 @@ class MainMenuView(arcade.View):
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
         self.manager._pixelated = True
-
-        self.style = {
-            "normal": arcade.gui.UIFlatButton.UIStyle(
-                font_size=45, font_color=arcade.color.WHITE,
-                bg=(120, 120, 120), font_name="ArcadeClassic",
-            ),
-            "hover": arcade.gui.UIFlatButton.UIStyle(
-                font_size=45, font_color=arcade.color.WHITE,
-                bg=(90, 90, 90), font_name="ArcadeClassic"
-            ),
-            "press": arcade.gui.UIFlatButton.UIStyle(
-                font_size=45, font_color=arcade.color.WHITE,
-                bg=(60, 60, 60), font_name="ArcadeClassic"
-            ),
-        }
 
         white_piece = arcade.load_texture("assets/sprites/white_pieces/pawn_white.png")
         black_piece = arcade.load_texture("assets/sprites/black_pieces/pawn_black.png")
@@ -47,9 +33,9 @@ class MainMenuView(arcade.View):
         self.manager.add(self._main_widget)
 
     def _set_up_main_ui(self):
-        vs_bot_button  = arcade.gui.UIFlatButton(text="VS BOT",    x=300, y=340, width=200, style=self.style)
-        vs_player_button = arcade.gui.UIFlatButton(text="VS PLAYER", x=300, y=270, width=200, style=self.style)
-        quit_button = arcade.gui.UIFlatButton(text="QUIT",      x=300, y=200, width=200, style=self.style)
+        vs_bot_button  = arcade.gui.UIFlatButton(text="VS BOT", x=300, y=340, width=200, style=BUTTTON_STYLE)
+        vs_player_button = arcade.gui.UIFlatButton(text="VS PLAYER", x=300, y=270, width=200, style=BUTTTON_STYLE)
+        quit_button = arcade.gui.UIFlatButton(text="QUIT", x=300, y=200, width=200, style=BUTTTON_STYLE)
 
         self._main_widget.add(vs_bot_button)
         self._main_widget.add(vs_player_button)
@@ -73,10 +59,10 @@ class MainMenuView(arcade.View):
             text="DIFFICULTY", font_size=55, font_name="ArcadeClassic", y=400, x=190
         ))
 
-        easy_button = arcade.gui.UIFlatButton(text="EASY",   x=300, y=330, width=200, style=self.style)
-        medium_button = arcade.gui.UIFlatButton(text="MEDIUM",  x=300, y=260, width=200, style=self.style)
-        hard_button = arcade.gui.UIFlatButton(text="HARD",   x=300, y=190, width=200, style=self.style)
-        back_button = arcade.gui.UIFlatButton(text="BACK",   x=300, y=120, width=200, style=self.style)
+        easy_button = arcade.gui.UIFlatButton(text="EASY", x=300, y=330, width=200, style=BUTTTON_STYLE)
+        medium_button = arcade.gui.UIFlatButton(text="MEDIUM", x=300, y=260, width=200, style=BUTTTON_STYLE)
+        hard_button = arcade.gui.UIFlatButton(text="HARD", x=300, y=190, width=200, style=BUTTTON_STYLE)
+        back_button = arcade.gui.UIFlatButton(text="BACK", x=300, y=120, width=200, style=BUTTTON_STYLE)
 
         self._difficulty_widget.add(easy_button)
         self._difficulty_widget.add(medium_button)
