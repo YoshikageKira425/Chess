@@ -69,8 +69,12 @@ class LocalChess(BaseChess):
 
         self.window.show_view(MainMenuView())
     
+    def on_update(self, delta_time: float):
+        self._pause_ui.update(delta_time)
+        self._end_screen_ui.update(delta_time)
+
     def on_draw(self):
         super().on_draw()
-        
+
         self._pause_ui.draw()
         self._end_screen_ui.draw()

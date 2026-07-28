@@ -17,7 +17,7 @@ BUTTTON_STYLE = {
     "normal": arcade.gui.UIFlatButton.UIStyle(
         font_size=45,
         font_color=arcade.color.WHITE,
-        bg=(135, 135, 135, 63),
+        bg=(135, 135, 135, 80),
         font_name="ArcadeClassic",
     ),
     "hover": arcade.gui.UIFlatButton.UIStyle(
