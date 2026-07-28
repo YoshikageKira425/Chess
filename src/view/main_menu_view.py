@@ -8,7 +8,7 @@ from src.constants import BUTTTON_STYLE
 
 class MainMenuView(arcade.View):
     def __init__(self):
-        super().__init__(background_color=arcade.color.GRAY)
+        super().__init__(background_color=arcade.color.SEA_GREEN)
 
         arcade.load_font("assets/font/ARCADECLASSIC.ttf")
 
@@ -55,7 +55,7 @@ class MainMenuView(arcade.View):
             
         @multiplayer_button.event("on_click")
         def on_multiplayer(*args):
-            pass
+            self.multiplayer()
 
         @quit_button.event("on_click")
         def on_quit(*args):
@@ -104,6 +104,9 @@ class MainMenuView(arcade.View):
             self.window.show_view(BotChess(difficulty))
         else:
             self.window.show_view(LocalChess())
+
+    def multiplayer(self):
+        self.window.show_view(MultiplayerMenuView())
 
     def quit(self):
         arcade.exit()
