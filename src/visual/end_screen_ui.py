@@ -1,10 +1,7 @@
 import arcade
 import arcade.gui
-from src.constants import BUTTTON_STYLE
+from src.constants import BUTTTON_STYLE, FADE_SPEED
 from src.enum.color_enum import Color
-
-_FADE_SPEED = 400   # alpha units per second
-
 
 class EndScreenUi:
     def __init__(self):
@@ -12,15 +9,18 @@ class EndScreenUi:
         self._manager._pixelated = True
         self._manager.disable()
         self._show = False
-        self._enter_alpha = 255.0   # starts fully black, fades to 0
+        self._enter_alpha = 255.0  
 
-        self._white_king_texture = arcade.load_texture("assets/sprites/white_pieces/king_white.png")
-        self._black_king_texture = arcade.load_texture("assets/sprites/black_pieces/king_black.png")
+        self._white_king_texture = arcade.load_texture(
+            "assets/sprites/white_pieces/king_white.png")
+        self._black_king_texture = arcade.load_texture(
+            "assets/sprites/black_pieces/king_black.png")
 
         self._set_up_ui()
 
     def _set_up_ui(self):
-        self._manager.add(arcade.gui.UISpace(width=800, height=600, color=(135, 135, 135, 150)))
+        self._manager.add(arcade.gui.UISpace(
+            width=800, height=600, color=(135, 135, 135, 150)))
 
         self._label = arcade.gui.UILabel(
             text="WHITE WINS",
@@ -59,23 +59,23 @@ class EndScreenUi:
         self._manager.add(self._main_menu_button)
 
     def set_up_ui_buttons(self, restart_func: callable, main_menu_func: callable):
-        self._restart_button.on_click   = lambda _: restart_func()
+        self._restart_button.on_click = lambda _: restart_func()
         self._main_menu_button.on_click = lambda _: main_menu_func()
 
     def show_end_screen(self, winner: Color | None = None):
         self._manager.enable()
-        self._show        = True
-        self._enter_alpha = 255.0   # reset fade each time
+        self._show = True
+        self._enter_alpha = 255.0 
 
         if winner:
-            tex   = self._white_king_texture if winner == Color.WHITE else self._black_king_texture
+            tex = self._white_king_texture if winner == Color.WHITE else self._black_king_texture
             label = "WHITE WINS" if winner == Color.WHITE else "BLACK WINS"
         else:
-            tex   = self._white_king_texture
+            tex = self._white_king_texture
             label = "STALEMATE"
 
         self._piece_image.texture = tex
-        self._label.label.text    = label  # update the underlying pyglet label
+        self._label.label.text = label  
 
     def hide_end_screen(self):
         self._manager.disable()
@@ -85,7 +85,8 @@ class EndScreenUi:
         if not self._show:
             return
         if self._enter_alpha > 0:
-            self._enter_alpha = max(0.0, self._enter_alpha - _FADE_SPEED * delta_time)
+            self._enter_alpha = max(
+                0.0, self._enter_alpha - FADE_SPEED * delta_time)
 
     def draw(self):
         if not self._show:

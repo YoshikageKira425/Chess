@@ -33,7 +33,7 @@ class ChessVisual():
         self._highlights = []
         
         board_image = arcade.gui.UIImage(
-            texture=arcade.load_texture("assets/sprites/board/board_with_border_01.png"),
+            texture=arcade.load_texture("assets/sprites/board/board_with_border_02.png"),
             x=140,
             y=40,
             width=528,

@@ -8,7 +8,7 @@ from ..enum.color_enum import Color
 
 class BaseChess(arcade.View):
     def __init__(self):
-        super().__init__(background_color=arcade.color.GRAY)
+        super().__init__(background_color=arcade.color.HUNTER_GREEN)
 
         self.board = Board()
 
