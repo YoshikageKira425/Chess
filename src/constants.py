@@ -27,19 +27,19 @@ BUTTTON_STYLE = {
     "normal": arcade.gui.UIFlatButton.UIStyle(
         font_size=45,
         font_color=arcade.color.WHITE,
-        bg=(35, 38, 58, 190),
+        bg=(35, 38, 58),
         font_name="ArcadeClassic",
     ),
     "hover": arcade.gui.UIFlatButton.UIStyle(
         font_size=45,
         font_color=(212, 175, 55),       # gold on hover
-        bg=(50, 55, 80, 210),
+        bg=(50, 55, 80),
         font_name="ArcadeClassic",
     ),
     "press": arcade.gui.UIFlatButton.UIStyle(
         font_size=45,
         font_color=(160, 130, 35),       # dimmed gold on press
-        bg=(25, 28, 45, 230),
+        bg=(25, 28, 45),
         font_name="ArcadeClassic",
     ),
 }
