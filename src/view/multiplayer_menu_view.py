@@ -47,11 +47,11 @@ class MultiplayerMenuView(arcade.View):
 
     def _set_up_main_ui(self):
         casual_play_button = arcade.gui.UIFlatButton(
-            text="CASUAL PLAY", x=300, y=340, width=200, style=BUTTTON_STYLE)
+            text="CASUAL PLAY", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
         competitive_play_button = arcade.gui.UIFlatButton(
-            text="COMPETITIVE PLAY", x=100, y=270, width=550, style=BUTTTON_STYLE)
+            text="COMPETITIVE PLAY", x=100, y=270, width=550, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
-            text="BACK", x=300, y=200, width=200, style=BUTTTON_STYLE)
+            text="BACK", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
 
         self._manager.add(casual_play_button)
         self._manager.add(competitive_play_button)

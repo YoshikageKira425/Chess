@@ -1,6 +1,6 @@
 import arcade
 import arcade.gui
-from src.constants import BUTTTON_STYLE, FADE_SPEED
+from src.constants import BUTTTON_STYLE, FADE_SPEED, GOLD, BG_COLOR
 from src.enum.color_enum import Color
 
 
@@ -10,7 +10,7 @@ class EndScreenUi:
         self._manager._pixelated = True
         self._manager.disable()
         self._show = False
-        self._alpha = 0.0    # 0 = invisible, 255 = fully visible
+        self._alpha = 0.0  
         self._target = 0.0
 
         self._white_king_texture = arcade.load_texture(
@@ -23,7 +23,7 @@ class EndScreenUi:
 
     def _set_up_ui(self):
         self._background = arcade.gui.UISpace(
-            width=800, height=600, color=(135, 135, 135, 0)
+            width=800, height=600, color=(*BG_COLOR, 0)
         )
         self._manager.add(self._background)
 
@@ -33,17 +33,17 @@ class EndScreenUi:
         self._manager.add(self._label)
 
         self._piece_image = arcade.gui.UIImage(
-            texture=self._white_king_texture, x=40, y=290, width=120, height=160
+            texture=self._white_king_texture, x=40, y=320, width=120, height=160
         )
         self._manager.add(self._piece_image)
 
         self._restart_button = arcade.gui.UIFlatButton(
-            text="RESTART", y=190, x=40, width=250, style=BUTTTON_STYLE
+            text="RESTART", y=250, x=40, width=250, height=55, style=BUTTTON_STYLE
         )
         self._manager.add(self._restart_button)
 
         self._main_menu_button = arcade.gui.UIFlatButton(
-            text="MAIN MENU", y=120, x=40, width=285, style=BUTTTON_STYLE
+            text="MAIN MENU", y=180, x=40, width=285, height=55, style=BUTTTON_STYLE
         )
         self._manager.add(self._main_menu_button)
 
@@ -76,11 +76,11 @@ class EndScreenUi:
             label = "STALEMATE"
 
         self._piece_image.texture = tex
-        self._label.label.text = label
+        self._label.text = label
 
     def hide_end_screen(self):
         self._target = 0.0
-        self._manager.disable()   # block input immediately
+        self._manager.disable() 
 
     def update(self, delta_time: float):
         if not self._show:
@@ -99,10 +99,10 @@ class EndScreenUi:
     def _apply_alpha(self):
         a = int(self._alpha)
 
-        self._background.color = (135, 135, 135, int(self._alpha * 150 / 255))
+        self._background.color = (*BG_COLOR, int(self._alpha * 150 / 255))
         self._piece_image.alpha = a
 
-        self._label.update_font(font_color=(255, 255, 255, a))
+        self._label.update_font(font_color=(*GOLD, a))
 
         for btn, base in zip(self._buttons, self._btn_base):
             for state, style in btn.style.items():

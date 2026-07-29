@@ -1,6 +1,6 @@
 import arcade
 import arcade.gui
-from src.constants import BUTTTON_STYLE, FADE_SPEED
+from src.constants import BUTTTON_STYLE, FADE_SPEED, GOLD, BG_COLOR
 
 
 class PauseUi:
@@ -8,7 +8,7 @@ class PauseUi:
         self._pause_manager = arcade.gui.UIManager()
         self._pause_manager.disable()
         self._is_paused = False
-        self._alpha = 0.0    # 0 = invisible, 255 = fully visible
+        self._alpha = 0.0
         self._target = 0.0
 
         self._set_up_pause_ui()
@@ -16,21 +16,21 @@ class PauseUi:
 
     def _set_up_pause_ui(self):
         self._background = arcade.gui.UISpace(
-            width=800, height=600, color=(135, 135, 135, 0)
+            width=800, height=600, color=(*BG_COLOR, 0)
         )
         self._pause_manager.add(self._background)
 
         self._label = arcade.gui.UILabel(
-            text="PAUSED", font_size=60, font_name="ArcadeClassic", y=520, x=40
+            text="PAUSED", font_size=60, text_color=GOLD, font_name="ArcadeClassic", y=500, x=40
         )
         self._pause_manager.add(self._label)
 
         self._resume_button = arcade.gui.UIFlatButton(
-            text="RESUME",    y=420, x=40, width=225, style=BUTTTON_STYLE)
+            text="RESUME",    y=420, x=40, width=225, height=55, style=BUTTTON_STYLE)
         self._restart_button = arcade.gui.UIFlatButton(
-            text="RESTART",   y=360, x=40, width=250, style=BUTTTON_STYLE)
+            text="RESTART",   y=350, x=40, width=250, height=55, style=BUTTTON_STYLE)
         self._main_menu_button = arcade.gui.UIFlatButton(
-            text="MAIN MENU", y=300, x=40, width=285, style=BUTTTON_STYLE)
+            text="MAIN MENU", y=280, x=40, width=285, height=55, style=BUTTTON_STYLE)
 
         self._pause_manager.add(self._resume_button)
         self._pause_manager.add(self._restart_button)
@@ -81,9 +81,9 @@ class PauseUi:
     def _apply_alpha(self):
         a = int(self._alpha)
 
-        self._background.color = (135, 135, 135, int(self._alpha * 150 / 255))
+        self._background.color = (*BG_COLOR, int(self._alpha * 150 / 255))
 
-        self._label.update_font(font_color=(255, 255, 255, a))
+        self._label.update_font(font_color=(*GOLD, a))
 
         for btn, base in zip(self._buttons, self._btn_base):
             for state, style in btn.style.items():

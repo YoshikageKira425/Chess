@@ -62,13 +62,13 @@ class MainMenuView(arcade.View):
 
     def _set_up_main_ui(self):
         vs_bot_button = arcade.gui.UIFlatButton(
-            text="VS BOT",      x=300, y=340, width=200, style=BUTTTON_STYLE)
+            text="VS BOT",      x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
         vs_player_button = arcade.gui.UIFlatButton(
-            text="VS PLAYER",   x=300, y=270, width=200, style=BUTTTON_STYLE)
+            text="VS PLAYER",   x=300, y=270, width=200, height=55, style=BUTTTON_STYLE)
         multiplayer_button = arcade.gui.UIFlatButton(
-            text="MULTIPLAYER", x=215, y=200, width=370, style=BUTTTON_STYLE)
+            text="MULTIPLAYER", x=215, y=200, width=370, height=55, style=BUTTTON_STYLE)
         quit_button = arcade.gui.UIFlatButton(
-            text="QUIT",         x=300, y=130, width=200, style=BUTTTON_STYLE)
+            text="QUIT",         x=300, y=130, width=200, height=55, style=BUTTTON_STYLE)
 
         self._main_widget.add(vs_bot_button)
         self._main_widget.add(vs_player_button)
@@ -97,13 +97,13 @@ class MainMenuView(arcade.View):
         ))
 
         easy_button = arcade.gui.UIFlatButton(
-            text="EASY",   x=300, y=330, width=200, style=BUTTTON_STYLE)
+            text="EASY",   x=300, y=330, width=200, height=55, style=BUTTTON_STYLE)
         medium_button = arcade.gui.UIFlatButton(
-            text="MEDIUM", x=300, y=260, width=200, style=BUTTTON_STYLE)
+            text="MEDIUM", x=300, y=260, width=200,height=55, style=BUTTTON_STYLE)
         hard_button = arcade.gui.UIFlatButton(
-            text="HARD",   x=300, y=190, width=200, style=BUTTTON_STYLE)
+            text="HARD",   x=300, y=190, width=200, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
-            text="BACK",   x=300, y=120, width=200, style=BUTTTON_STYLE)
+            text="BACK",   x=300, y=120, width=200, height=55, style=BUTTTON_STYLE)
 
         self._difficulty_widget.add(easy_button)
         self._difficulty_widget.add(medium_button)
