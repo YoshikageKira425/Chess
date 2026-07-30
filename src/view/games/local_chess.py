@@ -2,6 +2,7 @@ import arcade
 from ..base_chess_view import BaseChess
 from src.visual.pause_ui import PauseUi
 from src.visual.end_screen_ui import EndScreenUi
+from src.visual.promotion_ui import PromotionUi
 from src.core.bot.evaluator import evaluate
 from src.enum.color_enum import Color
 
@@ -10,6 +11,7 @@ class LocalChess(BaseChess):
         super().__init__()
         
         self._pause_ui = PauseUi()
+        self._promotion_ui = PromotionUi()
         self._end_screen_ui = EndScreenUi()
         
         self._pause_ui.set_up_ui_buttons(self.pause, self.restart, self.main_menu)
@@ -79,4 +81,5 @@ class LocalChess(BaseChess):
         super().on_draw()
 
         self._pause_ui.draw()
+        self._promotion_ui.draw()
         self._end_screen_ui.draw()
