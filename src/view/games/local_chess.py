@@ -40,7 +40,9 @@ class LocalChess(BaseChess):
             self.undo()
     
     def win(self):
-        self._end_screen_ui.show_end_screen(self.turn)
+        oppsite = Color.BLACK if self.turn == Color.WHITE else Color.WHITE
+        
+        self._end_screen_ui.show_end_screen(oppsite)
         return super().win()
     
     def stalemate(self):
