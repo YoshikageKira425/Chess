@@ -1,7 +1,7 @@
 import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE, BG_COLOR
-
+from src.enum.pieces_enum import Pieces
 
 class PromotionUi:
     def __init__(self):
@@ -21,14 +21,18 @@ class PromotionUi:
         ))
 
         self._promotion_buttons = {}
-        positions = {"Q": 200, "R": 320, "B": 440, "N": 560}
-        textures = {"Q": arcade.load_texture("assets/sprites/white_pieces/queen_white.png"), "R": arcade.load_texture("assets/sprites/white_pieces/tower_white.png"),
-                   "B": arcade.load_texture("assets/sprites/white_pieces/bishop_white.png"), "N": arcade.load_texture("assets/sprites/white_pieces/knight_white.png")}
+        textures = {Pieces.QUEEN: arcade.load_texture("assets/sprites/white_pieces/queen_white.png"), Pieces.ROOK: arcade.load_texture("assets/sprites/white_pieces/tower_white.png"),
+                   Pieces.BISHOP: arcade.load_texture("assets/sprites/white_pieces/bishop_white.png"), Pieces.KNIGHT: arcade.load_texture("assets/sprites/white_pieces/knight_white.png")}
 
-        for piece_type, x in positions.items():
-            btn = arcade.gui.UITextureButton(x=x, y=300, width=108, height=144, texture=textures[piece_type])
+        started_x = 200
+
+        for piece_type, texture in textures.items():
+            btn = arcade.gui.UITextureButton(x=started_x, y=300, width=108, height=144, texture=texture)
+            
             self._promotion_widget.add(btn)
             self._promotion_buttons[piece_type] = btn
+            
+            started_x += 120
 
     def show_promotion(self, callback: callable):
         for piece_type, btn in self._promotion_buttons.items():

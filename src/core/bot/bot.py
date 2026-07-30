@@ -46,7 +46,7 @@ class Bot:
 
         return (best_score, best_from, best_to)
     
-    def chose_promotion(self) -> str:
+    def chose_promotion(self) -> Pieces:
         best_score = float('-inf')
         result = "Q"  
         alpha = float('-inf')

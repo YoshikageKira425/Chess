@@ -5,6 +5,7 @@ from src.visual.end_screen_ui import EndScreenUi
 from src.visual.promotion_ui import PromotionUi
 from src.core.bot.evaluator import evaluate
 from src.enum.color_enum import Color
+from src.enum.pieces_enum import Pieces
 
 class LocalChess(BaseChess):
     def __init__(self):
@@ -40,6 +41,13 @@ class LocalChess(BaseChess):
             
         if symbol == arcade.key.SPACE and not self.is_match_finished and self.board.actions:
             self.undo()
+    
+    def promotion(self):
+        self._promotion_ui.show_promotion(self._promotion_pawn)
+        
+    def _promotion_pawn(self, piece_type: Pieces):
+        self.board.promote(piece_type)
+        self.finish_turn()
     
     def win(self):
         oppsite = Color.BLACK if self.turn == Color.WHITE else Color.WHITE

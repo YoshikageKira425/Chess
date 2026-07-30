@@ -15,6 +15,12 @@ class BotChess(LocalChess):
         if self.bot.bot_color == self.turn:
             self.bot_move()
             
+    def promotion(self):
+        if self.bot.bot_color == self.turn:
+            self.board.promote(self.bot.chose_promotion())
+        else:
+            super().promotion()
+            
     def undo(self):
         super().undo()
         super().undo()
