@@ -1,7 +1,7 @@
 import arcade
 import arcade.gui
-from src.enum.color_enum import Color
-from src.enum.pieces_enum import Pieces
+from chess_core.enum.color_enum import Color
+from chess_core.enum.pieces_enum import Pieces
 from src.constants import BAR_WIDTH, BAR_X, BAR_Y, MAX_SCORE, GOLD, BUTTTON_STYLE
 
 

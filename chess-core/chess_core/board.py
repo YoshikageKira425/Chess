@@ -1,14 +1,13 @@
-from src.pieces.piece import Piece
-from src.pieces.pawn import Pawn
-from src.pieces.knight import Knight
-from src.pieces.rook import Rook
-from src.pieces.bishop import Bishop
-from src.pieces.queen import Queen
-from src.pieces.king import King
-from src.action import Action
-from src.enum.color_enum import Color
-from src.enum.pieces_enum import Pieces
-
+from chess_core.pieces.piece import Piece
+from chess_core.pieces.pawn import Pawn
+from chess_core.pieces.knight import Knight
+from chess_core.pieces.rook import Rook
+from chess_core.pieces.bishop import Bishop
+from chess_core.pieces.queen import Queen
+from chess_core.pieces.king import King
+from chess_core.action import Action
+from chess_core.enum.color_enum import Color
+from chess_core.enum.pieces_enum import Pieces
 
 class Board:
     def __init__(self):

@@ -4,8 +4,8 @@ from src.visual.pause_ui import PauseUi
 from src.visual.end_screen_ui import EndScreenUi
 from src.visual.promotion_ui import PromotionUi
 from src.core.evaluator import evaluate
-from src.enum.color_enum import Color
-from src.enum.pieces_enum import Pieces
+from chess_core.enum.color_enum import Color
+from chess_core.enum.pieces_enum import Pieces
 
 class LocalChess(BaseChess):
     def __init__(self):

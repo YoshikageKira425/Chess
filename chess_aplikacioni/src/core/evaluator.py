@@ -1,12 +1,12 @@
-from src.pieces.piece import Piece
-from src.pieces.pawn import Pawn
-from src.pieces.knight import Knight
-from src.pieces.rook import Rook
-from src.pieces.bishop import Bishop
-from src.pieces.queen import Queen
-from src.pieces.king import King
-from src.core.board import Board
-from src.enum.color_enum import Color
+from chess_core.pieces.piece import Piece
+from chess_core.pieces.pawn import Pawn
+from chess_core.pieces.knight import Knight
+from chess_core.pieces.rook import Rook
+from chess_core.pieces.bishop import Bishop
+from chess_core.pieces.queen import Queen
+from chess_core.pieces.king import King
+from chess_core.board import Board
+from chess_core.enum.color_enum import Color
 
 MATERIAL_SCORE = {Pawn: 1, Knight: 3, Rook:5, Bishop: 3, Queen: 9}
 

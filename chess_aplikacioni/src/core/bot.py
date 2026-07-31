@@ -1,8 +1,8 @@
-from src.core.board import Board
+from chess_core.board import Board
 from .evaluator import evaluate
-from src.enum.color_enum import Color
-from src.enum.pieces_enum import Pieces
-from src.enum.difficulty_enum import Difficulty
+from chess_core.enum.color_enum import Color
+from chess_core.enum.pieces_enum import Pieces
+from chess_core.enum.difficulty_enum import Difficulty
 
 DIFFICULTY = {
     Difficulty.EASY: 1,

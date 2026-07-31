@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from src.pieces.piece import Piece
-
+from chess_core.pieces.piece import Piece
 
 @dataclass
 class Action:

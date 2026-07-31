@@ -1,7 +1,7 @@
 import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE, FADE_SPEED, GOLD, BG_COLOR
-from src.enum.color_enum import Color
+from chess_core.enum.color_enum import Color
 
 
 class EndScreenUi:

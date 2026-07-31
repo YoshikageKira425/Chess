@@ -1,5 +1,5 @@
 from .piece import Piece
-from ..constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
+from .._constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
 
 def straight_path_clear(board:list[list[Piece]], from_pos:tuple, to_pos:tuple) -> bool:
     from_row, from_col = from_pos

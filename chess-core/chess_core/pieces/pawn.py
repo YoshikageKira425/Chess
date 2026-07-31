@@ -1,5 +1,5 @@
 from .piece import Piece
-from ..constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
+from .._constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
 from ..enum.color_enum import Color
 from ..action import Action
 

@@ -1,7 +1,7 @@
 import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE, BG_COLOR
-from src.enum.pieces_enum import Pieces
+from chess_core.enum.pieces_enum import Pieces
 
 class PromotionUi:
     def __init__(self):

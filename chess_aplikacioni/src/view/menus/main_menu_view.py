@@ -4,7 +4,7 @@ import arcade.gui
 from ..games.local_chess import LocalChess
 from ..games.bot_chess import BotChess
 from .multiplayer_menu_view import MultiplayerMenuView
-from src.enum.difficulty_enum import Difficulty
+from chess_core.enum.difficulty_enum import Difficulty
 from src.constants import BUTTTON_STYLE, FADE_SPEED, FLOAT_AMP, FLOAT_FREQ
 
 

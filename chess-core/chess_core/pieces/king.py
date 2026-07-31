@@ -1,5 +1,5 @@
 from .piece import Piece
-from ..constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
+from .._constants import HIGHLIGHT_MOVE, HIGHLIGHT_CAPTURE
 
 class King(Piece):
     def __init__(self, piece):
