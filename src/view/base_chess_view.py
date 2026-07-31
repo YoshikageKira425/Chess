@@ -3,7 +3,7 @@ from src.visual.chess_visual import ChessVisual
 from src.visual.chess_information_ui import ChessInformationUi
 from src.core.board import Board
 from ..constants import HIGHLIGHT_SELECTED, HIGHLIGHT_CAPTURE, BOARD_OFFSET_X, BOARD_OFFSET_Y
-from ..core.bot.evaluator import evaluate
+from ..core.evaluator import evaluate
 from ..enum.color_enum import Color
 
 class BaseChess(arcade.View):

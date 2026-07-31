@@ -20,8 +20,6 @@ FLOAT_FREQ = 1.8
 BG_COLOR = (15,  15,  25)           # near-black navy
 GOLD = (212, 175,  55)          # chess gold accent
 GOLD_DIM = (160, 130,  35)          # muted gold for press state
-PANEL_BG = (25,  28,  45, 235)      # dark panel interior
-PANEL_BORDER = (212, 175,  55, 200)     # gold panel border
 
 BUTTTON_STYLE = {
     "normal": arcade.gui.UIFlatButton.UIStyle(
@@ -32,13 +30,13 @@ BUTTTON_STYLE = {
     ),
     "hover": arcade.gui.UIFlatButton.UIStyle(
         font_size=45,
-        font_color=(212, 175, 55),       # gold on hover
+        font_color=GOLD,       # gold on hover
         bg=(50, 55, 80),
         font_name="ArcadeClassic",
     ),
     "press": arcade.gui.UIFlatButton.UIStyle(
         font_size=45,
-        font_color=(160, 130, 35),       # dimmed gold on press
+        font_color=GOLD_DIM,       # dimmed gold on press
         bg=(25, 28, 45),
         font_name="ArcadeClassic",
     ),

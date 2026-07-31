@@ -3,7 +3,7 @@ from ..base_chess_view import BaseChess
 from src.visual.pause_ui import PauseUi
 from src.visual.end_screen_ui import EndScreenUi
 from src.visual.promotion_ui import PromotionUi
-from src.core.bot.evaluator import evaluate
+from src.core.evaluator import evaluate
 from src.enum.color_enum import Color
 from src.enum.pieces_enum import Pieces
 
@@ -77,7 +77,7 @@ class LocalChess(BaseChess):
         self.visual.clear_highlights()
         
     def main_menu(self):
-        from src.view.main_menu_view import MainMenuView
+        from ..menus.main_menu_view import MainMenuView
 
         self.window.show_view(MainMenuView())
     

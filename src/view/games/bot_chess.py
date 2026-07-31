@@ -1,7 +1,7 @@
 from .local_chess import LocalChess
 from src.enum.difficulty_enum import Difficulty
 from src.enum.color_enum import Color
-from src.core.bot.bot import Bot
+from src.core.bot import Bot
 
 class BotChess(LocalChess):
     def __init__(self, difficulty: Difficulty):
