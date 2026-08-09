@@ -1,8 +1,9 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import ForeignKey, DateTime
 from datetime import datetime
+from ..database import Base
 
-class GameMove(DeclarativeBase):
+class GameMove(Base):
     __tablename__ = "game_moves"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

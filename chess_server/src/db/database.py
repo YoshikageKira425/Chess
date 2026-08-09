@@ -10,6 +10,9 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
+class Base(DeclarativeBase):
+    pass
+
 async def get_db():
     async with SessionLocal() as session:
         yield session
@@ -17,4 +20,4 @@ async def get_db():
 async def init_db():
     """Creates all tables on startup."""
     async with engine.begin() as conn:
-        await conn.run_sync(DeclarativeBase.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all)

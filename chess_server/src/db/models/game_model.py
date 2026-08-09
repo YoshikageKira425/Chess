@@ -1,9 +1,10 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, DateTime
 from datetime import datetime
 from src.enum.game_status import GameStatus
+from ..database import Base
 
-class Game(DeclarativeBase):
+class Game(Base):
     __tablename__ = "games"
     
     id: Mapped[str] = mapped_column(primary_key=True, autoincrement=True)
