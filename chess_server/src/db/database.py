@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase
 from dotenv import load_dotenv
 import os
 
@@ -12,3 +13,8 @@ SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 async def get_db():
     async with SessionLocal() as session:
         yield session
+        
+async def init_db():
+    """Creates all tables on startup."""
+    async with engine.begin() as conn:
+        await conn.run_sync(DeclarativeBase.metadata.create_all)
