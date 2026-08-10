@@ -3,17 +3,11 @@ from sqlalchemy import select
 from datetime import datetime, timezone
 from src.db.models.game_model import Game
 from src.db.models.user_model import User
+from chess_core.board import Board
 import json
-
+from src.game_manager import game_manager
 
 class GamesController:
-
-    @staticmethod
-    async def get(db: AsyncSession, game_id: int) -> Game | None:
-        result = await db.execute(
-            select(Game).where(Game.id == game_id)
-        )
-        return result.scalar_one_or_none()
 
     @staticmethod
     async def create(db: AsyncSession, white_player_id: int, black_player_id: int) -> Game:
@@ -24,50 +18,39 @@ class GamesController:
         db.add(game)
         await db.commit()
         await db.refresh(game)
+
+        game_manager.create_session(game.id, white_player_id, black_player_id)
+
         return game
 
     @staticmethod
-    async def add_move(db: AsyncSession, game_id: int, from_pos: tuple, to_pos: tuple) -> Game | None:
-        result = await db.execute(
-            select(Game).where(Game.id == game_id)
-        )
-        game = result.scalar_one_or_none()
+    async def add_move(db: AsyncSession, game_id: int, from_pos: tuple, to_pos: tuple, player_id: int) -> dict:
+        session = game_manager.get_session(game_id)
 
-        if game is None:
-            return None
+        if session is None:
+            return {"success": False, "reason": "game not found"}
 
+        result = session.make_move(from_pos, to_pos, player_id)
+
+        if not result["success"]:
+            return result
+
+        game = await GamesController.get(db, game_id)
         moves = json.loads(game.moves)
         moves.append({"from": from_pos, "to": to_pos})
         game.moves = json.dumps(moves)
 
-        await db.commit()
-        await db.refresh(game)
-        return game
+        if result["status"] == "checkmate":
+            game.winner_id = player_id
+            game.ended_at = datetime.now(timezone.utc)
+            game_manager.remove_session(game_id)
 
-    @staticmethod
-    async def end(db: AsyncSession, game_id: int, winner_id: int | None, is_draw: bool = False) -> Game | None:
-        result = await db.execute(
-            select(Game).where(Game.id == game_id)
-        )
-        game = result.scalar_one_or_none()
-
-        if game is None:
-            return None
-
-        game.winner_id = winner_id
-        game.is_draw = is_draw
-        game.ended_at = datetime.now(timezone.utc)
+        elif result["status"] == "stalemate":
+            game.is_draw = True
+            game.ended_at = datetime.now(timezone.utc)
+            game_manager.remove_session(game_id)
 
         await db.commit()
         await db.refresh(game)
-        return game
 
-    @staticmethod
-    async def get_user_games(db: AsyncSession, user_id: int) -> list[Game]:
-        result = await db.execute(
-            select(Game).where(
-                (Game.white_player_id == user_id) |
-                (Game.black_player_id == user_id)
-            ).order_by(Game.started_at.desc())
-        )
-        return result.scalars().all()
+        return result
