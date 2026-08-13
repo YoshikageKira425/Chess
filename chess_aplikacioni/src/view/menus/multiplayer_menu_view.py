@@ -1,37 +1,41 @@
-import math
 import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE
 from ..base_menu_view import BaseMenuView
 from src.core.network.account_manager import AccountManager
 
+
 class MultiplayerMenuView(BaseMenuView):
     def __init__(self):
         super().__init__()
-        
+
         self.account = AccountManager()
-        
+        self._form_mode = "login"  
+
         self._main_widget = arcade.gui.UIWidget()
         self._account_widget = arcade.gui.UIWidget()
-        
-        self._active_widget = self._main_widget
+        self._form_widget = arcade.gui.UIWidget()
 
         self._set_up_main_ui()
         self._set_up_account()
-        
-        self._manager.add(self._main_widget)
+        self._set_up_form()
+
+        self._active_widget = self._main_widget
+        self._manager.add(self._active_widget)
 
     def _set_up_main_ui(self):
         casual_play_button = arcade.gui.UIFlatButton(
             text="PLAY", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
             text="BACK", x=300, y=270, width=200, height=55, style=BUTTTON_STYLE)
-        account_button = arcade.gui.UIFlatButton(
-            text="Account", x=50, y=30, width=250, height=55, style=BUTTTON_STYLE)
+
+        account_label = self.account.username or "ACCOUNT"
+        self._account_button = arcade.gui.UIFlatButton(
+            text=account_label, x=50, y=30, width=250, height=55, style=BUTTTON_STYLE)
 
         self._main_widget.add(casual_play_button)
         self._main_widget.add(back_button)
-        self._main_widget.add(account_button)
+        self._main_widget.add(self._account_button)
 
         @casual_play_button.event("on_click")
         def play(*args):
@@ -40,40 +44,138 @@ class MultiplayerMenuView(BaseMenuView):
         @back_button.event("on_click")
         def on_back(*args):
             self.back()
-            
-        @account_button.event("on_click")
+
+        @self._account_button.event("on_click")
         def on_account(*args):
             self.switch_to(self._account_widget)
-            
+
     def _set_up_account(self):
         signup_button = arcade.gui.UIFlatButton(
             text="SIGN UP", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
         login_button = arcade.gui.UIFlatButton(
             text="LOG IN", x=300, y=270, width=200, height=55, style=BUTTTON_STYLE)
+        logout_button = arcade.gui.UIFlatButton(
+            text="LOG OUT", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
-            text="BACK", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
-        
+            text="BACK", x=300, y=130, width=200, height=55, style=BUTTTON_STYLE)
+
         self._account_widget.add(signup_button)
         self._account_widget.add(login_button)
+        self._account_widget.add(logout_button)
         self._account_widget.add(back_button)
-        
+
         @signup_button.event("on_click")
         def on_signup(*args):
-            print("Sign up")
-                    
+            self._form_mode = "signup"
+            self._form_title.text = "SIGN UP"
+            self._submit_button.text = "SIGN UP"
+            self.username_input.text = ""
+            self.password_input.text = ""
+            self.switch_to(self._form_widget)
+
         @login_button.event("on_click")
         def on_login(*args):
-            print("Login")
-            
+            self._form_mode = "login"
+            self._form_title.text = "LOG IN"
+            self._submit_button.text = "LOG IN"
+            self.username_input.text = ""
+            self.password_input.text = ""
+            self.switch_to(self._form_widget)
+
+        @logout_button.event("on_click")
+        def on_logout(*args):
+            self.account.logout()
+            self._account_button.text = "ACCOUNT"
+            self.switch_to(self._main_widget)
+
         @back_button.event("on_click")
         def on_back(*args):
-            self.switch_to(self._main_widget)     
-        
+            self.switch_to(self._main_widget)
+
+    def _set_up_form(self):
+        self._form_title = arcade.gui.UILabel(
+            text="SIGN UP",
+            font_size=55,
+            font_name="ArcadeClassic",
+            x=300, y=400
+        )
+
+        self._status_label = arcade.gui.UILabel(
+            text="Username taken or password too short",
+            font_size=26,
+            font_name="ArcadeClassic",
+            x=300, y=155,
+            text_color=arcade.color.RED
+        )
+        self._status_label.text = ""
+
+        self.username_input = arcade.gui.UIInputText(
+            text="", x=300, y=350,
+            width=200, height=40,
+            font_size=20, font_name="ArcadeClassic"
+        )
+        self.password_input = arcade.gui.UIInputText(
+            text="", x=300, y=280,
+            width=200, height=40,
+            font_size=20, font_name="ArcadeClassic"
+        )
+
+        self._submit_button = arcade.gui.UIFlatButton(
+            text="LOG IN", x=300, y=210,
+            width=200, height=55, style=BUTTTON_STYLE
+        )
+        back_button = arcade.gui.UIFlatButton(
+            text="BACK", x=300, y=140,
+            width=200, height=55, style=BUTTTON_STYLE
+        )
+
+        self._form_widget.add(self._form_title)
+        self._form_widget.add(self.username_input)
+        self._form_widget.add(self.password_input)
+        self._form_widget.add(self._submit_button)
+        self._form_widget.add(back_button)
+        self._form_widget.add(self._status_label)
+
+        @self._submit_button.event("on_click")
+        def on_submit(*args):
+            self._handle_submit()
+
+        @back_button.event("on_click")
+        def on_back(*args):
+            self._status_label.text = ""
+            self.switch_to(self._account_widget)
+
+    def _handle_submit(self):
+        username = self.username_input.text.strip()
+        password = self.password_input.text.strip()
+
+        if not username or not password:
+            self._status_label.text = "Fill in all fields"
+            return
+
+        if self._form_mode == "login":
+            success = self.account.login(username, password)
+            if success:
+                self._account_button.text = self.account.username
+                self._status_label.text = ""
+                self.switch_to(self._main_widget)
+            else:
+                self._status_label.text = "Invalid credentials"
+
+        elif self._form_mode == "signup":
+            success = self.account.signup(username, password)
+            if success:
+                self._account_button.text = self.account.username
+                self._status_label.text = ""
+                self.switch_to(self._main_widget)
+            else:
+                self._status_label.text = "Username taken or password too short"
+
     def play(self):
         player_id = self.account.get_player_id()
         if not player_id:
             return
-        
+
         from ..games.online_chess import OnlineGameView
         self.window.show_view(OnlineGameView(player_id))
 
