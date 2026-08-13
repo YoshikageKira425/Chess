@@ -29,7 +29,7 @@ class BaseChess(arcade.View):
             return
         
         if self.selected:
-            self._move_piece(self.selected, (row, col))
+            self.move_piece(self.selected, (row, col))
             self._stop_moving()
             return
 
@@ -43,7 +43,7 @@ class BaseChess(arcade.View):
         self.selected = (row, col)
         self._update_highlights()
 
-    def _move_piece(self, from_pos: tuple, to_pos: tuple):
+    def move_piece(self, from_pos: tuple, to_pos: tuple):
         if not self.board.is_valid_move(from_pos, to_pos):
             return
 
@@ -118,7 +118,7 @@ class BaseChess(arcade.View):
 
             if self.board.is_within_bounds(row, col):
                 if self.board.get(row, col) is None:
-                    self._move_piece(self.selected, (row, col))
+                    self.move_piece(self.selected, (row, col))
                     self._stop_moving()
 
     def on_draw(self):

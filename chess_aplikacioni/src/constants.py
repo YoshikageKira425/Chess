@@ -8,6 +8,8 @@ HIGHLIGHT_SELECTED = (255, 215, 0,  140)   # gold
 HIGHLIGHT_MOVE = (49, 99, 49, 180)   # green
 HIGHLIGHT_CAPTURE = (220,  60,  60, 140)  # red
 
+SERVER_URL = "http://localhost:8000"
+
 BAR_WIDTH = 521.5
 BAR_X = 140
 BAR_Y = 15

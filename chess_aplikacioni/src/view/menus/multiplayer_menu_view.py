@@ -3,33 +3,28 @@ import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE, FADE_SPEED, FLOAT_AMP, FLOAT_FREQ
 from ..base_menu_view import BaseMenuView
-
+from src.core.network.account_manager import AccountManager
 
 class MultiplayerMenuView(BaseMenuView):
     def __init__(self):
         super().__init__()
 
+        self.account = AccountManager()
+
         self._set_up_main_ui()
 
     def _set_up_main_ui(self):
         casual_play_button = arcade.gui.UIFlatButton(
-            text="CASUAL PLAY", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
-        competitive_play_button = arcade.gui.UIFlatButton(
-            text="COMPETITIVE PLAY", x=100, y=270, width=550, height=55, style=BUTTTON_STYLE)
+            text="CASUAL", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
-            text="BACK", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
+            text="BACK", x=300, y=270, width=200, height=55, style=BUTTTON_STYLE)
 
         self._manager.add(casual_play_button)
-        self._manager.add(competitive_play_button)
         self._manager.add(back_button)
 
         @casual_play_button.event("on_click")
-        def casual_match(*args):
-            print("Casual Match")
-
-        @competitive_play_button.event("on_click")
-        def competitive_match(*args):
-            print("Competitive Match")
+        def play(*args):
+            self.play()
 
         @back_button.event("on_click")
         def on_back(*args):
@@ -38,6 +33,14 @@ class MultiplayerMenuView(BaseMenuView):
     def back(self):
         from .main_menu_view import MainMenuView
         self.window.show_view(MainMenuView())
+        
+    def play(self):
+        player_id = self.account.get_player_id()
+        if not player_id:
+            return
+        
+        from ..games.online_chess import OnlineGameView
+        self.window.show_view(OnlineGameView(player_id))
 
     def on_update(self, delta_time: float):
         self._time += delta_time

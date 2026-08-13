@@ -29,4 +29,4 @@ class BotChess(LocalChess):
         from_pos, to_pos = self.bot.get_move()
         
         if from_pos and to_pos:
-            self._move_piece(from_pos, to_pos)
+            self.move_piece(from_pos, to_pos)

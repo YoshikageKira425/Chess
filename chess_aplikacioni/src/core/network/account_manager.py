@@ -1,10 +1,7 @@
 import requests
 import json
 import os
-
-
-SERVER_URL = "http://localhost:8000"
-
+from src.constants import SERVER_URL
 
 class AccountManager:
     def __init__(self):
