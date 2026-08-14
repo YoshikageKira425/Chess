@@ -1,11 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from datetime import datetime, timezone
 from src.db.models.game_model import Game
-from src.db.models.user_model import User
-from chess_core.board import Board
 import json
-from src.game_manager import game_manager
+from src.core.game_manager import game_manager
 
 class GamesController:
 

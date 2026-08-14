@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.routes import auth, games, leaderboard
 from src.db.database import init_db
-from src.game_manager import game_manager
+from src.core.game_manager import game_manager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

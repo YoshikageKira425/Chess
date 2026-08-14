@@ -2,8 +2,8 @@ import json
 import random
 from fastapi import WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.matchmaking.queue import matchmaking_queue
-from src.game_manager import game_manager
+from src.core.queue import matchmaking_queue
+from src.core.game_manager import game_manager
 from src.controller.games_controller import GamesController
 
 

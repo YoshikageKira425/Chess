@@ -1,6 +1,7 @@
-from enum import StrEnum
+from enum import Enum
 
-class GameStatus:
-    ON_GOING = "on going"
-    FINISHED = "finished"
+class GameStatus(Enum):
+    ON_GOING = "on_going"
+    WHITE_WON = "white_won"
+    BLACK_WON = "black_won"
     DRAW = "draw"
