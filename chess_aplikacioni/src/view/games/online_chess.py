@@ -29,7 +29,6 @@ class OnlineGameView(BaseChess):
         self.ui.set_color(self.my_color)
 
     def _on_move_received(self, from_pos: tuple, to_pos: tuple):
-        print("TEST")
         self.board.move(tuple(from_pos), tuple(to_pos))
         self.updated_visuals(evaluate(self.board))
 

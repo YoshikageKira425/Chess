@@ -21,7 +21,7 @@ class NetworkManager:
         self._loop = asyncio.new_event_loop()
         self._thread.start()
 
-    def _run(self): 
+    def _run(self):
         asyncio.set_event_loop(self._loop)
         self._loop.run_until_complete(self._connect())
 

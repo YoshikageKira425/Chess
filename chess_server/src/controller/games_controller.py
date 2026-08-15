@@ -6,17 +6,16 @@ from sqlalchemy import select
 import json
 from src.core.game_manager import game_manager
 
+
 class GamesController:
 
     @staticmethod
     async def get(db: AsyncSession, game_id: int) -> Game:
         if not game_id:
             return None
-        
+
         result = await db.execute(select(Game).where(Game.id == game_id))
-        game = result.scalar_one_or_none()
-        
-        return game
+        return result.scalar_one_or_none()
 
     @staticmethod
     async def create(db: AsyncSession, white_player_id: int, black_player_id: int) -> Game:
@@ -44,9 +43,15 @@ class GamesController:
         if not result["success"]:
             return result
 
-        game = GamesController.get(db, game_id)
+        game = await GamesController.get(db, game_id)
+        if game is None:
+            return {"success": False, "reason": "game not found in db"}
 
-        move = MoveModel(game_id=game_id, from_pos=from_pos, to_pos=to_pos)
+        from_row, from_col = from_pos
+        to_row, to_col = to_pos
+
+        move = MoveModel(game_id=game_id, from_col=from_col,
+                         from_row=from_row, to_col=to_col, to_row=to_row)
 
         if result["status"] == "checkmate":
             game.winner_id = player_id
