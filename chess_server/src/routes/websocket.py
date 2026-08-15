@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.queue import matchmaking_queue
 from src.core.game_manager import game_manager
 from src.controller.games_controller import GamesController
+from chess_core.enum.color_enum import Color
 
 
 # Tracks which websocket belongs to which game
@@ -68,13 +69,13 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
     await send(white_ws, {
         "type": "match_found",
         "game_id": game_id,
-        "color": "white",
+        "color": Color.WHITE,
         "opponent_id": black_id,
     })
     await send(black_ws, {
         "type": "match_found",
         "game_id": game_id,
-        "color": "black",
+        "color": Color.BLACK,
         "opponent_id": white_id,
     })
 

@@ -9,8 +9,8 @@ class GamesController:
     @staticmethod
     async def create(db: AsyncSession, white_player_id: int, black_player_id: int) -> Game:
         game = Game(
-            white_player_id=white_player_id,
-            black_player_id=black_player_id,
+            white_player=white_player_id,
+            black_player=black_player_id,
         )
         db.add(game)
         await db.commit()

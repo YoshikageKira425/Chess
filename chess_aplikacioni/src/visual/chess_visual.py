@@ -51,7 +51,7 @@ class ChessVisual():
                 piece = board[row][col]
                 if piece is not None:
                     self._add_piece(piece, row, col, click_callback)
-                    
+            
     def _add_piece(self, piece: Piece, row: int, col: int, click_callback):
         types = {Pawn: Pieces.PAWN, Knight: Pieces.KNIGHT, Rook:Pieces.ROOK, Bishop: Pieces.BISHOP, Queen: Pieces.QUEEN, King: Pieces.KING}
         

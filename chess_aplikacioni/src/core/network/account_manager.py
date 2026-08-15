@@ -1,6 +1,4 @@
 import requests
-import json
-import os
 from src.constants import SERVER_URL
 
 class AccountManager:
@@ -8,22 +6,6 @@ class AccountManager:
         self.player_id = None
         self.username = None
         self.token = None
-
-        saved = self._read()
-        if saved:
-            self.login(saved["username"], saved["password"])
-
-    def _read(self) -> dict | None:
-        try:
-            with open("data/player_data.json") as f:
-                return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return None
-
-    def _save(self, username: str, password: str):
-        os.makedirs("data", exist_ok=True)
-        with open("data/player_data.json", "w") as f:
-            json.dump({"username": username, "password": password}, f)
 
     def is_logged_in(self) -> bool:
         return self.player_id is not None
@@ -69,7 +51,6 @@ class AccountManager:
                 self.player_id = data["id"]
                 self.username = data["username"]
                 self.token = data.get("token")
-                self._save(username, password)
                 return True
 
             return False
@@ -82,8 +63,3 @@ class AccountManager:
         self.player_id = None
         self.username = None
         self.token = None
-
-        try:
-            os.remove("data/player_data.json")
-        except FileNotFoundError:
-            pass
