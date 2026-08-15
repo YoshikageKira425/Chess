@@ -10,6 +10,8 @@ import asyncio
 class OnlineGameView(BaseChess):
     def __init__(self, player_id: int):
         super().__init__()
+        
+        self._showing_visuals = False
 
         self.network = NetworkManager(player_id)
         self.network.on_match_found = self._on_match_found
@@ -20,11 +22,14 @@ class OnlineGameView(BaseChess):
         self.ui = OnlineInformationUI()
 
     def _on_match_found(self, data: dict):
+        self._showing_visuals = True
+        
         self.my_color = data["color"]
 
         self.ui.set_color(self.my_color)
 
     def _on_move_received(self, from_pos: tuple, to_pos: tuple):
+        print("TEST")
         self.board.move(tuple(from_pos), tuple(to_pos))
         self.updated_visuals(evaluate(self.board))
 
@@ -66,5 +71,6 @@ class OnlineGameView(BaseChess):
         self.updated_visuals(evaluate(self.board))
 
     def on_draw(self):
-        super().on_draw()
-        self.ui.draw()
+        if self._showing_visuals:
+            super().on_draw()
+            self.ui.draw()

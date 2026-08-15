@@ -1,10 +1,22 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
 from src.db.models.game_model import Game
+from src.db.models.moves_model import MoveModel
+from sqlalchemy import select
 import json
 from src.core.game_manager import game_manager
 
 class GamesController:
+
+    @staticmethod
+    async def get(db: AsyncSession, game_id: int) -> Game:
+        if not game_id:
+            return None
+        
+        result = await db.execute(select(Game).where(Game.id == game_id))
+        game = result.scalar_one_or_none()
+        
+        return game
 
     @staticmethod
     async def create(db: AsyncSession, white_player_id: int, black_player_id: int) -> Game:
@@ -32,10 +44,9 @@ class GamesController:
         if not result["success"]:
             return result
 
-        game = await GamesController.get(db, game_id)
-        moves = json.loads(game.moves)
-        moves.append({"from": from_pos, "to": to_pos})
-        game.moves = json.dumps(moves)
+        game = GamesController.get(db, game_id)
+
+        move = MoveModel(game_id=game_id, from_pos=from_pos, to_pos=to_pos)
 
         if result["status"] == "checkmate":
             game.winner_id = player_id
@@ -47,6 +58,7 @@ class GamesController:
             game.ended_at = datetime.now(timezone.utc)
             game_manager.remove_session(game_id)
 
+        db.add(move)
         await db.commit()
         await db.refresh(game)
 

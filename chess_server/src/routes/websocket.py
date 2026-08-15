@@ -82,8 +82,10 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
     try:
         while True:
             data = json.loads(await websocket.receive_text())
-
+            print(data)
+            
             if data["type"] == "move":
+                print("TEST")
                 from_pos = tuple(data["from"])
                 to_pos = tuple(data["to"])
 
