@@ -50,7 +50,7 @@ class LocalChess(BaseChess):
         self.finish_turn()
     
     def win(self):
-        oppsite = Color.BLACK if self.turn == Color.WHITE else Color.WHITE
+        oppsite = self.turn.inverted()
         
         self._end_screen_ui.show_end_screen(oppsite)
         return super().win()
@@ -61,7 +61,7 @@ class LocalChess(BaseChess):
     
     def undo(self):
         self.board.undo()
-        self.turn = Color.WHITE if self.turn == Color.BLACK else Color.BLACK
+        self.turn = self.turn.inverted()
         self.updated_visuals(evaluate(self.board))
     
     def pause(self):

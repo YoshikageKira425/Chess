@@ -74,9 +74,9 @@ PIECE_SQUARE_TABLES = {
 }
 
 def evaluate(board: Board) -> int:
-    if board.is_king_threatened(False):
+    if board.is_king_threatened(Color.WHITE):
         return 9999
-    if board.is_king_threatened(True):
+    if board.is_king_threatened(Color.BLACK):
         return -9999
     
     score = evaluate_state(board)

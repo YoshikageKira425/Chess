@@ -20,7 +20,7 @@ class Bot:
         if depth == self.max_depth:
             return (evaluate(self.board), None, None)
 
-        opponent_color = Color.WHITE if self.bot_color == Color.BLACK else Color.BLACK
+        opponent_color = self.bot_color.inverted()
         current_turn = self.bot_color if depth % 2 == 0 else opponent_color
         is_minimizing = current_turn == opponent_color
 

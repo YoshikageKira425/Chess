@@ -6,57 +6,80 @@ from src.visual.end_screen_ui import EndScreenUi
 from src.visual.finding_match_ui import FindingMatchUI
 from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
 from src.core.evaluator import evaluate
-from chess_core.enum.color_enum import Color 
+from chess_core.enum.color_enum import Color
+
 
 class OnlineGameView(BaseChess):
     def __init__(self, player_id: int):
         super().__init__()
-        
+
         self._showing_visuals = False
         self_my_turn = False
 
         self.player_id = player_id
 
         self.network = NetworkManager(player_id)
-        self.network.on_match_found = self._on_match_found
-        self.network.on_move_received = self._on_move_received
-        self.network.on_game_over = self._game_over
-        self.network.on_opponent_disconnected = self.back
 
         self.ui = OnlineInformationUI()
         self.loading_ui = FindingMatchUI()
         self.end_screen_ui = EndScreenUi()
-        
+
         self.end_screen_ui.set_up_ui_buttons(None, self.back)
 
-    def _on_match_found(self, data: dict):
+    def on_update(self, delta_time: float):
+        self.end_screen_ui.update(delta_time)
+        self._process_network_events()
+
+    def on_draw(self):
+        if self._showing_visuals:
+            super().on_draw()
+
+            self.ui.draw()
+            self.end_screen_ui.draw()
+        else:
+            self.clear()
+            self.loading_ui.draw()
+
+    def _process_network_events(self):
+        while not self.network.events.empty():
+            data = self.network.events.get()
+            
+            match data.get("type"):
+                case "match_found":
+                    self._handle_match_found(Color(data["color"]))
+                case "move":
+                    self._handle_opponent_move(data["from"], data["to"])
+                case "game_over":
+                    self._handle_game_over(data["status"], data.get("winner_id"))
+                case "opponent_disconnected":
+                    self.back()
+
+    def _handle_match_found(self, color: Color):
         self._showing_visuals = True
-    
-        self.my_color = data["color"]
+
+        self.my_color = color
         self.ui.set_color(self.my_color)
         self._my_turn = self.my_color == Color.WHITE
 
-    def _on_move_received(self, from_pos: tuple, to_pos: tuple):
+    def _handle_opponent_move(self, from_pos: tuple, to_pos: tuple):
         self.board.move(tuple(from_pos), tuple(to_pos))
         self.updated_visuals(evaluate(self.board))
         self._stop_moving()
-        
-        self._my_turn = True
 
-    def _game_over(self, data: dict):
+        self._my_turn = True
+        self.information.set_turn(self.my_color)
+
+    def _handle_game_over(self, status: str, winner_id: int):
         self.is_match_finished = True
-        
-        status = data.get("status")
-        
+
         if status == "checkmate":
-            winner = data["winner_id"]
             color = None
-            
-            if winner == self.player_id:
+
+            if winner_id == self.player_id:
                 color = self.my_color
             else:
-                color = Color.WHITE if self.my_color == Color.BLACK else Color.BLACK
-                
+                color = self.my_color.inverted()
+
             self.end_screen_ui.show_end_screen(color)
         else:
             self.end_screen_ui.show_end_screen()
@@ -96,16 +119,4 @@ class OnlineGameView(BaseChess):
 
         self.updated_visuals(evaluate(self.board))
         self._stop_moving()
-
-    def on_update(self, delta_time: float):
-        self.end_screen_ui.update(delta_time)
-
-    def on_draw(self):
-        if self._showing_visuals:
-            super().on_draw()
-            
-            self.ui.draw()
-            self.end_screen_ui.draw()
-        else:
-            self.clear()
-            self.loading_ui.draw()
+        self.information.set_turn(self.my_color.inverted())

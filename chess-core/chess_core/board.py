@@ -189,7 +189,7 @@ class Board:
         return action
 
     def is_king_threatened(self, color: Color) -> bool:
-        enemy_color = Color.BLACK if color == Color.WHITE else Color.WHITE
+        enemy_color = color.inverted()
         king = self.white_king if enemy_color == Color.BLACK else self.black_king
         
         for row in range(8):
