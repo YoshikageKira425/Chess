@@ -4,6 +4,7 @@ from src.constants import BUTTTON_STYLE
 from ..base_menu_view import BaseMenuView
 from src.core.network.account_manager import AccountManager
 from src.visual.leaderboard_ui import LeaderboardUI
+from src.core.network.leaderboard import Leaderboard
 
 
 class MultiplayerMenuView(BaseMenuView):
@@ -64,6 +65,7 @@ class MultiplayerMenuView(BaseMenuView):
         @leaderboard_button.event("on_click")
         def on_leaderboard(*args):
             self.switch_to(self._leaderboard_widget)
+            self._leaderboard_ui.set_data(Leaderboard.gettin_top_ten())
 
         @back_button_leaderboard.event("on_click")
         def on_back(*args):
