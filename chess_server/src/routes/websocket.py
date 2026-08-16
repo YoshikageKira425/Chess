@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.queue import matchmaking_queue
 from src.core.game_manager import game_manager
 from src.controller.games_controller import GamesController
+from src.controller.user_controller import UserController
 from chess_core.enum.color_enum import Color
 
 active_connections: dict[int, dict[int, WebSocket]] = {}
@@ -50,6 +51,10 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                         "status": result["status"],
                         "winner_id": result.get("winner_id")
                     })
+                    
+                    loser_id = opponent_id if player_id == result.get("winner_id") else player_id
+                    
+                    await finish_game(db, result.get("winner_id"), loser_id)
                     
                     active_connections.pop(game_id, None)
                     return
@@ -121,4 +126,22 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
     await asyncio.gather(
         handle_player(white_ws, white_id, black_id, game_id, db),
         handle_player(black_ws, black_id, white_id, game_id, db),
+    )
+
+
+async def finish_game(
+    db: AsyncSession,
+    winner_id: int,
+    loser_id: int,
+):
+    await UserController.update_elo(
+        db,
+        winner_id,
+        10
+    )
+
+    await UserController.update_elo(
+        db,
+        loser_id,
+        -10
     )

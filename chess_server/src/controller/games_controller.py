@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from src.db.models.game_model import Game
 from src.db.models.moves_model import MoveModel
 from sqlalchemy import select
-import json
 from src.core.game_manager import game_manager
 
 
