@@ -34,13 +34,6 @@ class LeaderboardUI(arcade.gui.UIWidget):
         self._rows_container = arcade.gui.UIWidget()
         self._widget.add(self._rows_container)
 
-        self._populate_placeholder_rows()
-
-    def _populate_placeholder_rows(self):
-        self._rows_container.clear()
-        for i in range(10):
-            self._add_row(i + 1, "---", "---", i)
-
     def _add_row(self, rank: int, username: str, elo: str, index: int):
         y = 430 - (index * 38)
 
@@ -81,6 +74,9 @@ class LeaderboardUI(arcade.gui.UIWidget):
         ))
 
     def set_data(self, players: list[dict]):
+        if not players:
+            return
+        
         self._rows_container.clear()
         for i, player in enumerate(players[:10]):
             self._add_row(i + 1, player["username"], str(int(player["elo"])), i)
