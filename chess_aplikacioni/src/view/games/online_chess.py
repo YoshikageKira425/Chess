@@ -13,6 +13,7 @@ class OnlineGameView(BaseChess):
         super().__init__()
         
         self._showing_visuals = False
+        self_my_turn = False
 
         self.player_id = player_id
 
@@ -30,14 +31,17 @@ class OnlineGameView(BaseChess):
 
     def _on_match_found(self, data: dict):
         self._showing_visuals = True
-        
+    
         self.my_color = data["color"]
-
         self.ui.set_color(self.my_color)
+        self._my_turn = self.my_color == Color.WHITE
 
     def _on_move_received(self, from_pos: tuple, to_pos: tuple):
         self.board.move(tuple(from_pos), tuple(to_pos))
         self.updated_visuals(evaluate(self.board))
+        self._stop_moving()
+        
+        self._my_turn = True
 
     def _game_over(self, data: dict):
         self.is_match_finished = True
@@ -62,7 +66,7 @@ class OnlineGameView(BaseChess):
         self.window.show_view(MultiplayerMenuView())
 
     def on_piece_clicked(self, row: int, col: int):
-        if self.is_match_finished:
+        if self.is_match_finished or not self._my_turn:
             return
 
         if self.selected:
@@ -84,12 +88,14 @@ class OnlineGameView(BaseChess):
         if not self.board.is_valid_move(from_pos, to_pos):
             return
 
+        self._my_turn = False
         self.network.send_move(from_pos, to_pos)
 
         self.board.move(from_pos, to_pos)
         self.visual.update_board(self.board.grid, self.on_piece_clicked)
 
         self.updated_visuals(evaluate(self.board))
+        self._stop_moving()
 
     def on_update(self, delta_time: float):
         self.end_screen_ui.update(delta_time)
