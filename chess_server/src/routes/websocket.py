@@ -10,13 +10,16 @@ from chess_core.enum.color_enum import Color
 
 active_connections: dict[int, dict[int, WebSocket]] = {}
 
+
 async def send(ws: WebSocket, data: dict):
     await ws.send_text(json.dumps(data))
+
 
 async def broadcast(game_id: int, data: dict, exclude_player: int = None):
     for player_id, ws in active_connections.get(game_id, {}).items():
         if player_id != exclude_player:
             await send(ws, data)
+
 
 async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, game_id: int, db: AsyncSession):
     """Handles the game loop for a single player."""
@@ -42,7 +45,12 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                 }, exclude_player=player_id)
 
                 if result["status"] in ("checkmate", "stalemate"):
-                    await send(websocket, {"type": "game_over", "status": result["status"]})
+                    await broadcast(game_id, {
+                        "type": "game_over",
+                        "status": result["status"],
+                        "winner_id": result.get("winner_id")
+                    })
+                    
                     active_connections.pop(game_id, None)
                     return
 
@@ -73,9 +81,9 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
         # Wait until this player gets paired (queue will handle it)
         # The connection stays open — the opponent's join() will find us
         try:
-            await asyncio.Future()  
+            await asyncio.Future()
         except asyncio.CancelledError:
-            pass 
+            pass
         except WebSocketDisconnect:
             await matchmaking_queue.leave(player_id)
             return

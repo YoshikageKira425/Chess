@@ -54,7 +54,7 @@ class GamesController:
                          from_row=from_row, to_col=to_col, to_row=to_row)
 
         if result["status"] == "checkmate":
-            game.winner_id = player_id
+            game.winner_id = result.get("winner_id")
             game.ended_at = datetime.now(timezone.utc)
             game_manager.remove_session(game_id)
 
