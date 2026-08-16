@@ -2,6 +2,7 @@ import arcade
 from src.core.network.network_manager import NetworkManager
 from ..base_chess_view import BaseChess
 from src.visual.online_information_ui import OnlineInformationUI
+from src.visual.finding_match_ui import FindingMatchUI
 from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
 from src.core.evaluator import evaluate
 import asyncio
@@ -20,6 +21,7 @@ class OnlineGameView(BaseChess):
         self.network.on_opponent_disconnected = self.back
 
         self.ui = OnlineInformationUI()
+        self.loading_ui = FindingMatchUI()
 
     def _on_match_found(self, data: dict):
         self._showing_visuals = True
@@ -73,3 +75,6 @@ class OnlineGameView(BaseChess):
         if self._showing_visuals:
             super().on_draw()
             self.ui.draw()
+        else:
+            self.clear()
+            self.loading_ui.draw()
