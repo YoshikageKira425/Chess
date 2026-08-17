@@ -1,14 +1,16 @@
 import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE
-
+from src.core.network.account_manager import account_manager
 
 class LeaderboardUI(arcade.gui.UIWidget):
     def __init__(self):
         super().__init__()
-
+        
         self._widget = arcade.gui.UIWidget()
         self._rows: list[arcade.gui.UIWidget] = []
+        
+        self.username = account_manager.username
 
         self._set_up_ui()
 
@@ -38,6 +40,9 @@ class LeaderboardUI(arcade.gui.UIWidget):
         y = 430 - (index * 38)
 
         row_bg_color = (40, 43, 63, 180) if index % 2 == 0 else (30, 33, 50, 180)
+
+        if username == account_manager.username:
+            row_bg_color = (66, 72, 107, 180)
 
         self._rows_container.add(arcade.gui.UISpace(
             x=150, y=y - 6, width=510, height=36,
