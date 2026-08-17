@@ -63,3 +63,5 @@ class AccountManager:
         self.player_id = None
         self.username = None
         self.token = None
+
+account_manager = AccountManager()

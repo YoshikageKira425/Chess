@@ -2,7 +2,7 @@ import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE
 from ..base_menu_view import BaseMenuView
-from src.core.network.account_manager import AccountManager
+from src.core.network.account_manager import account_manager
 from src.visual.leaderboard_ui import LeaderboardUI
 from src.core.network.leaderboard import Leaderboard
 
@@ -11,7 +11,6 @@ class MultiplayerMenuView(BaseMenuView):
     def __init__(self):
         super().__init__()
 
-        self.account = AccountManager()
         self._form_mode = "login"
 
         self._leaderboard_ui = LeaderboardUI()
@@ -32,9 +31,9 @@ class MultiplayerMenuView(BaseMenuView):
         casual_play_button = arcade.gui.UIFlatButton(
             text="PLAY", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
-            text="BACK", x=300, y=270, width=200, height=55, style=BUTTTON_STYLE)
+            text="BACK", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
 
-        account_label = self.account.username or "ACCOUNT"
+        account_label = account_manager.username or "ACCOUNT"
         self._account_button = arcade.gui.UIFlatButton(
             text=account_label, x=50, y=30, width=250, height=55, style=BUTTTON_STYLE)
 
@@ -43,7 +42,7 @@ class MultiplayerMenuView(BaseMenuView):
         self._main_widget.add(self._account_button)
 
         leaderboard_button = arcade.gui.UIFlatButton(
-            text="LEADERBOARD", x=220, y=200, width=370, height=55, style=BUTTTON_STYLE)
+            text="LEADERBOARD", x=220, y=270, width=370, height=55, style=BUTTTON_STYLE)
         self._main_widget.add(leaderboard_button)
 
         back_button_leaderboard = arcade.gui.UIFlatButton(
@@ -106,7 +105,7 @@ class MultiplayerMenuView(BaseMenuView):
 
         @logout_button.event("on_click")
         def on_logout(*args):
-            self.account.logout()
+            account_manager.logout()
             self._account_button.text = "ACCOUNT"
             self.switch_to(self._main_widget)
 
@@ -176,25 +175,25 @@ class MultiplayerMenuView(BaseMenuView):
             return
 
         if self._form_mode == "login":
-            success = self.account.login(username, password)
+            success = account_manager.login(username, password)
             if success:
-                self._account_button.text = self.account.username
+                self._account_button.text = account_manager.username
                 self._status_label.text = ""
                 self.switch_to(self._main_widget)
             else:
                 self._status_label.text = "Invalid credentials"
 
         elif self._form_mode == "signup":
-            success = self.account.signup(username, password)
+            success = account_manager.signup(username, password)
             if success:
-                self._account_button.text = self.account.username
+                self._account_button.text = account_manager.username
                 self._status_label.text = ""
                 self.switch_to(self._main_widget)
             else:
                 self._status_label.text = "Username taken or password too short"
 
     def play(self):
-        player_id = self.account.get_player_id()
+        player_id = account_manager.get_player_id()
         if not player_id:
             return
 
