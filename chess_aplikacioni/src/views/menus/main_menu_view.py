@@ -6,7 +6,7 @@ from ..games.bot_chess import BotChess
 from .multiplayer_menu_view import MultiplayerMenuView
 from chess_core.enum.difficulty_enum import Difficulty
 from src.constants import BUTTTON_STYLE
-from ..base_menu_view import BaseMenuView
+from ..base.base_menu_view import BaseMenuView
 
 class MainMenuView(BaseMenuView):
     def __init__(self):

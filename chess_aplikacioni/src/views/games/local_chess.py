@@ -1,9 +1,9 @@
 import arcade
-from ..base_chess_view import BaseChess
-from src.visual.pause_ui import PauseUi
-from src.visual.end_screen_ui import EndScreenUi
-from src.visual.promotion_ui import PromotionUi
-from src.core.evaluator import evaluate
+from ..base.base_chess_view import BaseChess
+from src.ui.pause_ui import PauseUi
+from src.ui.end_screen_ui import EndScreenUi
+from src.ui.promotion_ui import PromotionUi
+from src.core.ai.evaluator import evaluate
 from chess_core.enum.color_enum import Color
 from chess_core.enum.pieces_enum import Pieces
 

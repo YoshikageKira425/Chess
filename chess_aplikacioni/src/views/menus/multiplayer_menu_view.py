@@ -1,9 +1,9 @@
 import arcade
 import arcade.gui
 from src.constants import BUTTTON_STYLE
-from ..base_menu_view import BaseMenuView
+from ..base.base_menu_view import BaseMenuView
 from src.core.network.account_manager import account_manager
-from src.visual.leaderboard_ui import LeaderboardUI
+from src.ui.leaderboard_ui import LeaderboardUI
 from src.core.network.leaderboard import Leaderboard
 
 

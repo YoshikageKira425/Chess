@@ -1,12 +1,12 @@
 import arcade
 from src.core.network.network_manager import NetworkManager
-from ..base_chess_view import BaseChess
-from src.visual.online_information_ui import OnlineInformationUI
-from src.visual.end_screen_ui import EndScreenUi
-from src.visual.finding_match_ui import FindingMatchUI
-from src.visual.pause_ui import PauseUi
+from ..base.base_chess_view import BaseChess
+from src.ui.online_information_ui import OnlineInformationUI
+from src.ui.end_screen_ui import EndScreenUi
+from src.ui.finding_match_ui import FindingMatchUI
+from src.ui.pause_ui import PauseUi
 from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
-from src.core.evaluator import evaluate
+from chess_aplikacioni.src.core.ai.evaluator import evaluate
 from chess_core.enum.color_enum import Color
 
 

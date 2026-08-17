@@ -1,5 +1,5 @@
 import arcade
-from src.view.menus.main_menu_view import MainMenuView
+from src.views.menus.main_menu_view import MainMenuView
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
