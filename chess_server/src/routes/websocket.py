@@ -52,9 +52,9 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                         "winner_id": result.get("winner_id")
                     })
                     
-                    loser_id = opponent_id if player_id == result.get("winner_id") else player_id
-                    
-                    await finish_game(db, result.get("winner_id"), loser_id)
+                    if result["status"] == "checkmate":
+                        loser_id = opponent_id if player_id == result.get("winner_id") else player_id
+                        await finish_game(db, result.get("winner_id"), loser_id)
                     
                     active_connections.pop(game_id, None)
                     return
@@ -66,11 +66,16 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                     "status": "resign",
                     "winner_id": opponent_id
                 })
+                
+                await finish_game(db, opponent_id, player_id)
+                                    
                 active_connections.pop(game_id, None)
                 return
 
     except WebSocketDisconnect:
         await broadcast(game_id, {"type": "opponent_disconnected"}, exclude_player=player_id)
+        await finish_game(db, opponent_id, player_id)
+                        
         active_connections.pop(game_id, None)
 
 

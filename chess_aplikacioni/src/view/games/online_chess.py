@@ -4,6 +4,7 @@ from ..base_chess_view import BaseChess
 from src.visual.online_information_ui import OnlineInformationUI
 from src.visual.end_screen_ui import EndScreenUi
 from src.visual.finding_match_ui import FindingMatchUI
+from src.visual.pause_ui import PauseUi
 from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
 from src.core.evaluator import evaluate
 from chess_core.enum.color_enum import Color
@@ -14,7 +15,7 @@ class OnlineGameView(BaseChess):
         super().__init__()
 
         self._showing_visuals = False
-        self_my_turn = False
+        self._my_turn = False
 
         self.player_id = player_id
 
@@ -22,19 +23,31 @@ class OnlineGameView(BaseChess):
 
         self.ui = OnlineInformationUI()
         self.loading_ui = FindingMatchUI()
+        self.pause_ui = PauseUi()
         self.end_screen_ui = EndScreenUi()
 
-        self.end_screen_ui.set_up_ui_buttons(None, self.back)
+        self._is_paused = False
+
+        self.pause_ui.remove_restart_button()
+        self.pause_ui.set_up_ui_buttons(self.pause, None, self.disconnect)
+        self.end_screen_ui.set_up_ui_buttons(self.replay, self.back)
 
     def on_update(self, delta_time: float):
         self.end_screen_ui.update(delta_time)
+        self.pause_ui.update(delta_time)
+        
         self._process_network_events()
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol in [arcade.key.TAB, arcade.key.ESCAPE, arcade.key.P] and not self.is_match_finished:
+            self.pause()
 
     def on_draw(self):
         if self._showing_visuals:
             super().on_draw()
 
             self.ui.draw()
+            self.pause_ui.draw()
             self.end_screen_ui.draw()
         else:
             self.clear()
@@ -84,6 +97,9 @@ class OnlineGameView(BaseChess):
         else:
             self.end_screen_ui.show_end_screen()
 
+    def disconnect(self):
+        self.back()
+
     def back(self):
         from ..menus.multiplayer_menu_view import MultiplayerMenuView
         self.window.show_view(MultiplayerMenuView())
@@ -120,3 +136,10 @@ class OnlineGameView(BaseChess):
         self.updated_visuals(evaluate(self.board))
         self._stop_moving()
         self.information.set_turn(self.my_color.inverted())
+
+    def pause(self):
+        self._is_paused = not self._is_paused
+        self.pause_ui.pause(self._is_paused)
+    
+    def replay(self):
+        self.window.show_view(OnlineGameView(self.player_id))

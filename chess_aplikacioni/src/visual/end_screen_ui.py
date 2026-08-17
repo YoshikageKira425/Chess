@@ -38,7 +38,7 @@ class EndScreenUi:
         self._manager.add(self._piece_image)
 
         self._restart_button = arcade.gui.UIFlatButton(
-            text="RESTART", y=250, x=40, width=250, height=55, style=BUTTTON_STYLE
+            text="REPLAY", y=250, x=40, width=250, height=55, style=BUTTTON_STYLE
         )
         self._manager.add(self._restart_button)
 

@@ -55,6 +55,9 @@ class PauseUi:
         self._restart_button.on_click = lambda _: restart_func()
         self._main_menu_button.on_click = lambda _: main_menu_func()
 
+    def remove_restart_button(self):
+        self._pause_manager.remove(self._restart_button)
+
     def pause(self, value: bool):
         if value:
             self._is_paused = True
