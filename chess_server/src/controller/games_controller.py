@@ -29,6 +29,20 @@ class GamesController:
         game_manager.create_session(game.id, white_player_id, black_player_id)
 
         return game
+    
+    @staticmethod
+    async def end(db: AsyncSession, game_id: int, winner_id: int | None = None, is_draw: bool | None = None):
+        game = await GamesController.get(db, game_id)
+        if not game:
+            return
+        
+        game.winner_id = winner_id
+        game.is_draw = is_draw
+        game.ended_at = datetime.now(timezone.utc)
+        game_manager.remove_session(game_id)
+        
+        await db.commit()
+        await db.refresh(game)
 
     @staticmethod
     async def add_move(db: AsyncSession, game_id: int, from_pos: tuple, to_pos: tuple, player_id: int) -> dict:
@@ -42,10 +56,6 @@ class GamesController:
         if not result["success"]:
             return result
 
-        game = await GamesController.get(db, game_id)
-        if game is None:
-            return {"success": False, "reason": "game not found in db"}
-
         from_row, from_col = from_pos
         to_row, to_col = to_pos
 
@@ -53,17 +63,11 @@ class GamesController:
                          from_row=from_row, to_col=to_col, to_row=to_row)
 
         if result["status"] == "checkmate":
-            game.winner_id = result.get("winner_id")
-            game.ended_at = datetime.now(timezone.utc)
-            game_manager.remove_session(game_id)
-
+            GamesController.end(db, game_id, result["winner_id"])
         elif result["status"] == "stalemate":
-            game.is_draw = True
-            game.ended_at = datetime.now(timezone.utc)
-            game_manager.remove_session(game_id)
+            GamesController.end(db, game_id, None, True)
 
         db.add(move)
         await db.commit()
-        await db.refresh(game)
 
         return result

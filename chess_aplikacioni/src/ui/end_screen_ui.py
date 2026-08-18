@@ -63,7 +63,7 @@ class EndScreenUi:
         self._restart_button.on_click = lambda _: restart_func()
         self._main_menu_button.on_click = lambda _: main_menu_func()
 
-    def show_end_screen(self, winner: Color | None = None):
+    def show_end_screen(self, winner: Color | None = None, custom_label: str | None = None):
         self._manager.enable()
         self._show = True
         self._target = 255.0
@@ -74,6 +74,9 @@ class EndScreenUi:
         else:
             tex = self._white_king_texture
             label = "STALEMATE"
+            
+        if custom_label:
+            label = custom_label
 
         self._piece_image.texture = tex
         self._label.text = label

@@ -4,9 +4,9 @@ from ..base.base_chess_view import BaseChess
 from src.ui.online_information_ui import OnlineInformationUI
 from src.ui.end_screen_ui import EndScreenUi
 from src.ui.finding_match_ui import FindingMatchUI
-from src.ui.pause_ui import PauseUi
+from src.ui.pause_online_ui import PauseUi
 from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
-from chess_aplikacioni.src.core.ai.evaluator import evaluate
+from src.core.ai.evaluator import evaluate
 from chess_core.enum.color_enum import Color
 
 
@@ -28,8 +28,7 @@ class OnlineGameView(BaseChess):
 
         self._is_paused = False
 
-        self.pause_ui.remove_restart_button()
-        self.pause_ui.set_up_ui_buttons(self.pause, None, self.disconnect)
+        self.pause_ui.set_up_ui_buttons(self.pause, self.disconnect)
         self.end_screen_ui.set_up_ui_buttons(self.replay, self.back)
 
     def on_update(self, delta_time: float):
@@ -94,10 +93,14 @@ class OnlineGameView(BaseChess):
                 color = self.my_color.inverted()
 
             self.end_screen_ui.show_end_screen(color)
-        else:
+        elif status == "stalemate":
             self.end_screen_ui.show_end_screen()
+        else:
+            self.end_screen_ui.show_end_screen(custom_label="Resigned")
 
     def disconnect(self):
+        self.network.resign()
+        
         self.back()
 
     def back(self):
