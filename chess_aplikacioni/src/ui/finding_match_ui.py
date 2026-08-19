@@ -10,7 +10,7 @@ class FindingMatchUI:
             arcade.gui.UILabel(
                 "Finding Match!!",
                 font_size=60,
-                font_name="ArcadeClassic",
+                font_name="BoldPixels",
                 y=270, x=100
             )
         )

@@ -93,7 +93,7 @@ class MultiplayerMenuView(BaseMenuView):
         _save_me_label = arcade.gui.UILabel(
             text="REMEMBER ME",
             font_size=18,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             x=110, y=62,
             text_color=arcade.color.WHITE
         )
@@ -141,14 +141,14 @@ class MultiplayerMenuView(BaseMenuView):
         self._form_title = arcade.gui.UILabel(
             text="SIGN UP",
             font_size=55,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             x=300, y=400
         )
 
         self._status_label = arcade.gui.UILabel(
             text="Username taken or password too short",
             font_size=26,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             x=300, y=155,
             text_color=arcade.color.RED
         )
@@ -157,12 +157,12 @@ class MultiplayerMenuView(BaseMenuView):
         self.username_input = arcade.gui.UIInputText(
             text="", x=300, y=350,
             width=200, height=40,
-            font_size=20, font_name="ArcadeClassic"
+            font_size=20, font_name="BoldPixels"
         )
         self.password_input = arcade.gui.UIInputText(
             text="", x=300, y=280,
             width=200, height=40,
-            font_size=20, font_name="ArcadeClassic"
+            font_size=20, font_name="BoldPixels"
         )
 
         self._submit_button = arcade.gui.UIFlatButton(

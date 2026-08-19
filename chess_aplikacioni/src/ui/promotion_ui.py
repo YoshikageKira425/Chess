@@ -17,7 +17,7 @@ class PromotionUi:
             width=800, height=600, color=(*BG_COLOR, 180)
         ))
         self._promotion_widget.add(arcade.gui.UILabel(
-            text="PROMOTE", font_size=50, font_name="ArcadeClassic", x=40, y=520
+            text="PROMOTE", font_size=50, font_name="BoldPixels", x=40, y=520
         ))
 
         self._promotion_buttons = {}

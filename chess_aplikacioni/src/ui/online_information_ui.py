@@ -25,7 +25,7 @@ class OnlineInformationUI:
         self._manager.add(arcade.gui.UILabel(
             text="YOUR COLOR",
             font_size=16,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             bold=True,
             text_color=arcade.color.WHITE,
             x=7,

@@ -28,7 +28,7 @@ class ChessInformationUi:
         self._turn_label = arcade.gui.UILabel(
             text="WHITE'S TURN",
             font_size=16,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             bold=True,
             text_color=arcade.color.WHITE,
             x=7,
@@ -53,7 +53,7 @@ class ChessInformationUi:
         self._manager.add(arcade.gui.UILabel(
             text="W",
             font_size=16,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             bold=True,
             text_color=(220, 220, 220),
             x=BAR_X + BAR_WIDTH + 6,
@@ -62,7 +62,7 @@ class ChessInformationUi:
         self._manager.add(arcade.gui.UILabel(
             text="B",
             font_size=16,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             bold=True,
             text_color=(140, 140, 140),
             x=BAR_X - 24,
@@ -91,7 +91,7 @@ class ChessInformationUi:
         self._promotion_widget.add(arcade.gui.UILabel(
             text="PROMOTE",
             font_size=50,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             text_color=(*GOLD, 255),
             x=265,
             y=510,

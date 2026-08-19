@@ -21,7 +21,7 @@ class PauseUi:
         self._pause_manager.add(self._background)
 
         self._label = arcade.gui.UILabel(
-            text="PAUSED", font_size=60, text_color=GOLD, font_name="ArcadeClassic", y=500, x=40
+            text="PAUSED", font_size=60, text_color=GOLD, font_name="BoldPixels", y=500, x=40
         )
         self._pause_manager.add(self._label)
 

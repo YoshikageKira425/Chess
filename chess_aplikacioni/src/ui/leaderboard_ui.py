@@ -16,15 +16,15 @@ class LeaderboardUI(arcade.gui.UIWidget):
 
     def _set_up_ui(self):
         self._widget.add(arcade.gui.UILabel(
-            text="#", font_size=20, font_name="ArcadeClassic",
+            text="#", font_size=20, font_name="BoldPixels",
             x=155, y=470
         ))
         self._widget.add(arcade.gui.UILabel(
-            text="PLAYER", font_size=20, font_name="ArcadeClassic",
+            text="PLAYER", font_size=20, font_name="BoldPixels",
             x=210, y=470
         ))
         self._widget.add(arcade.gui.UILabel(
-            text="ELO", font_size=20, font_name="ArcadeClassic",
+            text="ELO", font_size=20, font_name="BoldPixels",
             x=530, y=470
         ))
 
@@ -59,21 +59,21 @@ class LeaderboardUI(arcade.gui.UIWidget):
         self._rows_container.add(arcade.gui.UILabel(
             text=str(rank),
             font_size=18,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             x=155, y=y,
             text_color=rank_color
         ))
         self._rows_container.add(arcade.gui.UILabel(
             text=str(username),
             font_size=18,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             x=210, y=y,
             text_color=arcade.color.WHITE
         ))
         self._rows_container.add(arcade.gui.UILabel(
             text=str(elo),
             font_size=18,
-            font_name="ArcadeClassic",
+            font_name="BoldPixels",
             x=530, y=y,
             text_color=rank_color
         ))

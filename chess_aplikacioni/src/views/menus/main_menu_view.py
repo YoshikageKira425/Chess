@@ -10,7 +10,8 @@ from ..base.base_menu_view import BaseMenuView
 
 class MainMenuView(BaseMenuView):
     def __init__(self):
-        arcade.load_font("assets/font/ARCADECLASSIC.ttf")
+        arcade.load_font("assets/font/BoldPixels.ttf")
+        arcade.load_font("assets/font/BoldPixels.ttf")
         
         super().__init__()
 
@@ -56,7 +57,7 @@ class MainMenuView(BaseMenuView):
 
     def _set_up_difficulty_ui(self):
         self._difficulty_widget.add(arcade.gui.UILabel(
-            text="DIFFICULTY", font_size=55, font_name="ArcadeClassic", y=400, x=190
+            text="DIFFICULTY", font_size=55, font_name="BoldPixels", y=400, x=190
         ))
 
         easy_button = arcade.gui.UIFlatButton(

@@ -29,7 +29,7 @@ class BaseMenuView(arcade.View):
         ))
 
         self._manager.add(arcade.gui.UILabel(
-            "CHESS", font_size=80, font_name="ArcadeClassic", y=470, x=250
+            "CHESS", font_size=80, font_name="BoldPixels", y=470, x=250
         ))
 
         white_tex = arcade.load_texture(

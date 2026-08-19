@@ -28,7 +28,7 @@ class EndScreenUi:
         self._manager.add(self._background)
 
         self._label = arcade.gui.UILabel(
-            text="WHITE WINS", font_size=55, font_name="ArcadeClassic", y=480, x=40
+            text="WHITE WINS", font_size=55, font_name="BoldPixels", y=480, x=40
         )
         self._manager.add(self._label)
 
