@@ -79,11 +79,31 @@ class MultiplayerMenuView(BaseMenuView):
             text="LOG OUT", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
             text="BACK", x=300, y=130, width=200, height=55, style=BUTTTON_STYLE)
+        
+        toggle_on  = arcade.load_texture("assets/ui/toggle_on.png")
+        toggle_off = arcade.load_texture("assets/ui/toggle_off.png")
+
+        _save_me_toggle = arcade.gui.UITextureToggle(
+            on_texture=toggle_on,
+            off_texture=toggle_off,
+            x=50, y=50,
+            width=50, height=50,
+            value=True
+        )
+        _save_me_label = arcade.gui.UILabel(
+            text="REMEMBER ME",
+            font_size=18,
+            font_name="ArcadeClassic",
+            x=110, y=62,
+            text_color=arcade.color.WHITE
+        )
 
         self._account_widget.add(signup_button)
         self._account_widget.add(login_button)
         self._account_widget.add(logout_button)
         self._account_widget.add(back_button)
+        self._account_widget.add(_save_me_toggle)
+        self._account_widget.add(_save_me_label)
 
         @signup_button.event("on_click")
         def on_signup(*args):
@@ -112,6 +132,10 @@ class MultiplayerMenuView(BaseMenuView):
         @back_button.event("on_click")
         def on_back(*args):
             self.switch_to(self._main_widget)
+            
+        @_save_me_toggle.event("on_change")
+        def on_toggle_change(event):
+            self._on_save_me_changed(event.new_value)
 
     def _set_up_form(self):
         self._form_title = arcade.gui.UILabel(
@@ -203,3 +227,6 @@ class MultiplayerMenuView(BaseMenuView):
     def back(self):
         from .main_menu_view import MainMenuView
         self.window.show_view(MainMenuView())
+
+    def _on_save_me_changed(self, value: bool):
+        account_manager.remeber_me = value
