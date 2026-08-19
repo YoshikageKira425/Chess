@@ -72,11 +72,11 @@ class MultiplayerMenuView(BaseMenuView):
 
     def _set_up_account(self):
         signup_button = arcade.gui.UIFlatButton(
-            text="SIGN UP", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
+            text="SIGN UP", x=285, y=340, width=230, height=55, style=BUTTTON_STYLE)
         login_button = arcade.gui.UIFlatButton(
-            text="LOG IN", x=300, y=270, width=200, height=55, style=BUTTTON_STYLE)
+            text="LOG IN", x=285, y=270, width=230, height=55, style=BUTTTON_STYLE)
         logout_button = arcade.gui.UIFlatButton(
-            text="LOG OUT", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
+            text="LOG OUT", x=285, y=200, width=230, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
             text="BACK", x=300, y=130, width=200, height=55, style=BUTTTON_STYLE)
         
@@ -142,7 +142,7 @@ class MultiplayerMenuView(BaseMenuView):
             text="SIGN UP",
             font_size=55,
             font_name="BoldPixels",
-            x=300, y=400
+            x=280, y=400
         )
 
         self._status_label = arcade.gui.UILabel(
@@ -155,19 +155,19 @@ class MultiplayerMenuView(BaseMenuView):
         self._status_label.text = ""
 
         self.username_input = arcade.gui.UIInputText(
-            text="", x=300, y=350,
-            width=200, height=40,
+            text="", x=285, y=350,
+            width=230, height=40,
             font_size=20, font_name="BoldPixels"
         )
         self.password_input = arcade.gui.UIInputText(
-            text="", x=300, y=280,
-            width=200, height=40,
+            text="", x=285, y=280,
+            width=230, height=40,
             font_size=20, font_name="BoldPixels"
         )
 
         self._submit_button = arcade.gui.UIFlatButton(
-            text="LOG IN", x=300, y=210,
-            width=200, height=55, style=BUTTTON_STYLE
+            text="LOG IN", x=285, y=210,
+            width=230, height=55, style=BUTTTON_STYLE
         )
         back_button = arcade.gui.UIFlatButton(
             text="BACK", x=300, y=140,

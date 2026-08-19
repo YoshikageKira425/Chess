@@ -26,11 +26,11 @@ class MainMenuView(BaseMenuView):
 
     def _set_up_main_ui(self):
         vs_bot_button = arcade.gui.UIFlatButton(
-            text="VS BOT",      x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
+            text="VS BOT",      x=290, y=340, width=220, height=55, style=BUTTTON_STYLE)
         vs_player_button = arcade.gui.UIFlatButton(
-            text="VS PLAYER",   x=300, y=270, width=200, height=55, style=BUTTTON_STYLE)
+            text="VS PLAYER",   x=250, y=270, width=300, height=55, style=BUTTTON_STYLE)
         multiplayer_button = arcade.gui.UIFlatButton(
-            text="MULTIPLAYER", x=215, y=200, width=370, height=55, style=BUTTTON_STYLE)
+            text="MULTIPLAYER", x=210, y=200, width=380, height=55, style=BUTTTON_STYLE)
         quit_button = arcade.gui.UIFlatButton(
             text="QUIT",         x=300, y=130, width=200, height=55, style=BUTTTON_STYLE)
 
