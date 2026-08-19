@@ -3,11 +3,12 @@ import json
 import threading
 from queue import Queue
 import websockets
+from src.constants import SERVER_WS
 
 class NetworkManager:
     def __init__(self, player_id: int):
         self.player_id = player_id
-        self.url = f"ws://localhost:8000/game/ws/{player_id}"
+        self.url = f"{SERVER_WS}/game/ws/{player_id}"
 
         self.websocket = None
         self.events = Queue()

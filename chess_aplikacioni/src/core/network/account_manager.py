@@ -1,11 +1,18 @@
 import requests
-from src.constants import SERVER_URL
+from ..data_manager import DataManager
+from src.constants import SERVER_HTTP, ACCOUNT_DATA_FILE
 
 class AccountManager:
     def __init__(self):
         self.player_id = None
         self.username = None
         self.token = None
+        
+        self.remeber_me = True
+        
+        data = DataManager.read(ACCOUNT_DATA_FILE)
+        if data:
+            self.login(data.get("username"), data.get("password"))
 
     def is_logged_in(self) -> bool:
         return self.player_id is not None
@@ -19,7 +26,7 @@ class AccountManager:
 
         try:
             response = requests.post(
-                f"{SERVER_URL}/auth/login",
+                f"{SERVER_HTTP}/auth/login",
                 json={"username": username, "password": password}
             )
 
@@ -28,6 +35,10 @@ class AccountManager:
                 self.player_id = data["id"]
                 self.username = data["username"]
                 self.token = data.get("token")
+                
+                if self.remeber_me:
+                    DataManager.write(ACCOUNT_DATA_FILE, {"username": username, "password": password})
+                
                 return True
 
             return False
@@ -42,7 +53,7 @@ class AccountManager:
 
         try:
             response = requests.post(
-                f"{SERVER_URL}/auth/signup",
+                f"{SERVER_HTTP}/auth/signup",
                 json={"username": username, "password": password}
             )
 
@@ -51,6 +62,10 @@ class AccountManager:
                 self.player_id = data["id"]
                 self.username = data["username"]
                 self.token = data.get("token")
+                
+                if self.remeber_me:
+                    DataManager.write(ACCOUNT_DATA_FILE, {"username": username, "password": password})
+                                    
                 return True
 
             return False
@@ -63,5 +78,7 @@ class AccountManager:
         self.player_id = None
         self.username = None
         self.token = None
+        
+        DataManager.delete(ACCOUNT_DATA_FILE)
 
 account_manager = AccountManager()
