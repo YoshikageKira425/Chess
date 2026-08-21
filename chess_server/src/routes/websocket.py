@@ -24,9 +24,20 @@ async def broadcast(game_id: int, data: dict, exclude_player: int = None):
 
 async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, game_id: int, db: AsyncSession):
     """Handles the game loop for a single player."""
+    MOVE_TIMEOUT = 60.0
+
     try:
         while True:
-            data = json.loads(await websocket.receive_text())
+            try:
+                raw = await asyncio.wait_for(
+                    websocket.receive_text(),
+                    timeout=MOVE_TIMEOUT
+                )
+            except asyncio.TimeoutError:
+                await ending_match(db, game_id, opponent_id, player_id, "timeout")
+                return
+
+            data = json.loads(raw)
 
             if data["type"] == "move":
                 from_pos = tuple(data["from"])
@@ -46,36 +57,20 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                 }, exclude_player=player_id)
 
                 if result["status"] in ("checkmate", "stalemate"):
-                    await broadcast(game_id, {
-                        "type": "game_over",
-                        "status": result["status"],
-                        "winner_id": result.get("winner_id")
-                    })
-                    
-                    if result["status"] == "checkmate":
-                        loser_id = opponent_id if player_id == result.get("winner_id") else player_id
-                        await finish_game(db, result.get("winner_id"), loser_id)
-                    
-                    active_connections.pop(game_id, None)
+                    loser_id = opponent_id if player_id == result.get(
+                        "winner_id") else player_id
+                    await ending_match(db, game_id, result.get("winner_id"), loser_id, result["status"])
+
                     return
 
             elif data["type"] == "resign":
-                await GamesController.end(db, game_id, winner_id=opponent_id)
-                await broadcast(game_id, {
-                    "type": "game_over",
-                    "status": "resign",
-                    "winner_id": opponent_id
-                })
-                
-                await finish_game(db, opponent_id, player_id)
-                                    
-                active_connections.pop(game_id, None)
+                await ending_match(db, game_id, opponent_id, player_id, "resign")
                 return
 
     except WebSocketDisconnect:
         await broadcast(game_id, {"type": "opponent_disconnected"}, exclude_player=player_id)
-        await finish_game(db, opponent_id, player_id)
-                        
+        await updated_elo(db, opponent_id, player_id)
+
         active_connections.pop(game_id, None)
 
 
@@ -85,11 +80,8 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
     opponent = await matchmaking_queue.join(player_id, websocket)
 
     if opponent is None:
-        # Waiting — send waiting message and hold until opponent joins
         await send(websocket, {"type": "waiting"})
 
-        # Wait until this player gets paired (queue will handle it)
-        # The connection stays open — the opponent's join() will find us
         try:
             await asyncio.Future()
         except asyncio.CancelledError:
@@ -134,19 +126,31 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
     )
 
 
-async def finish_game(
+async def ending_match(
     db: AsyncSession,
+    game_id: int,
     winner_id: int,
     loser_id: int,
+    status: str
 ):
-    await UserController.update_elo(
-        db,
-        winner_id,
-        10
-    )
+    await broadcast(game_id, {
+        "type": "game_over",
+        "status": status,
+        "winner_id": winner_id
+    })
+    await GamesController.end(db, game_id, winner_id=winner_id)
 
-    await UserController.update_elo(
-        db,
-        loser_id,
-        -10
-    )
+    if status in ["checkmate", "resign", "timeout"]:
+        await UserController.update_elo(
+            db,
+            winner_id,
+            10
+        )
+
+        await UserController.update_elo(
+            db,
+            loser_id,
+            -10
+        )
+
+    active_connections.pop(game_id, None)
