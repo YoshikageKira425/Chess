@@ -72,13 +72,13 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
         await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")
 
 
-async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
+async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType, db: AsyncSession):
     await websocket.accept()
 
     opponent = await matchmaking_queue.join(player_id, websocket)
 
     if opponent is None:
-        await send(websocket, {"type": "waiting"})
+        await send(websocket, {"type": "waiting", "type_game": type_game})
 
         try:
             await asyncio.Future()
@@ -97,7 +97,7 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
         white_id, black_id = opponent_id, player_id
         white_ws, black_ws = opponent_ws, websocket
 
-    game = await GamesController.create(db, white_id, black_id, GameType.CASUAL)
+    game = await GamesController.create(db, white_id, black_id, type_game)
     game_id = game.id
 
     active_connections[game_id] = {
@@ -139,7 +139,8 @@ async def ending_match(
     })
     await GamesController.end(db, game_id, winner_id=winner_id)
 
-    if status in ["checkmate", "resign", "timeout"]:
+    game = game_manager.get_session(game_id)
+    if status in ["checkmate", "resign", "timeout"] and not game.is_casual_match():
         await UserController.update_elo(
             db,
             winner_id,
