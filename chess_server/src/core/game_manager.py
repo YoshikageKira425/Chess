@@ -1,7 +1,6 @@
 from chess_core.board import Board
 from chess_core.enum.color_enum import Color
-from src.enum.game_type import GameType
-
+from chess_core.enum.game_type import GameType
 
 class GameSession:
     def __init__(self, game_id: int, white_player_id: int, black_player_id: int, type: GameType):

@@ -8,20 +8,17 @@ from src.core.game_manager import game_manager
 from src.controller.games_controller import GamesController
 from src.controller.user_controller import UserController
 from chess_core.enum.color_enum import Color
-from src.enum.game_type import GameType
+from chess_core.enum.game_type import GameType
 
 active_connections: dict[int, dict[int, WebSocket]] = {}
 
-
 async def send(ws: WebSocket, data: dict):
     await ws.send_text(json.dumps(data))
-
 
 async def broadcast(game_id: int, data: dict, exclude_player: int = None):
     for player_id, ws in active_connections.get(game_id, {}).items():
         if player_id != exclude_player:
             await send(ws, data)
-
 
 async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, game_id: int, db: AsyncSession):
     """Handles the game loop for a single player."""
@@ -71,14 +68,13 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
     except WebSocketDisconnect:
         await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")
 
-
 async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType, db: AsyncSession):
     await websocket.accept()
 
-    opponent = await matchmaking_queue.join(player_id, websocket)
+    opponent = await matchmaking_queue.join(player_id, type_game, websocket)
 
     if opponent is None:
-        await send(websocket, {"type": "waiting", "type_game": type_game})
+        await send(websocket, {"type": "waiting"})
 
         try:
             await asyncio.Future()
@@ -122,7 +118,6 @@ async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType,
         handle_player(white_ws, white_id, black_id, game_id, db),
         handle_player(black_ws, black_id, white_id, game_id, db),
     )
-
 
 async def ending_match(
     db: AsyncSession,

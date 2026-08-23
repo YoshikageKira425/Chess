@@ -8,10 +8,11 @@ from src.ui.pause_online_ui import PauseUi
 from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
 from src.core.ai.evaluator import evaluate
 from chess_core.enum.color_enum import Color
+from chess_core.enum.game_type import GameType
 
 
 class OnlineGameView(BaseChess):
-    def __init__(self, player_id: int):
+    def __init__(self, player_id: int, type: GameType):
         super().__init__()
 
         self._showing_visuals = False
@@ -19,7 +20,7 @@ class OnlineGameView(BaseChess):
 
         self.player_id = player_id
 
-        self.network = NetworkManager(player_id)
+        self.network = NetworkManager(player_id, type)
 
         self.ui = OnlineInformationUI()
         self.loading_ui = FindingMatchUI()

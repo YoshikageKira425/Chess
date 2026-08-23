@@ -5,6 +5,7 @@ from ..base.base_menu_view import BaseMenuView
 from src.core.network.account_manager import account_manager
 from src.ui.leaderboard_ui import LeaderboardUI
 from src.core.network.leaderboard import Leaderboard
+from chess_core.enum.game_type import GameType
 
 
 class MultiplayerMenuView(BaseMenuView):
@@ -222,7 +223,7 @@ class MultiplayerMenuView(BaseMenuView):
             return
 
         from ..games.online_chess import OnlineGameView
-        self.window.show_view(OnlineGameView(player_id))
+        self.window.show_view(OnlineGameView(player_id, GameType.CASUAL))
 
     def back(self):
         from .main_menu_view import MainMenuView

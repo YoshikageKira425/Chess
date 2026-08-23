@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, DateTime, Enum
 from src.enum.game_status import GameStatus
-from src.enum.game_type import GameType
+from chess_core.enum.game_type import GameType
 from datetime import datetime
 from ..database import Base
 

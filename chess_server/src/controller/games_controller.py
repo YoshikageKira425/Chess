@@ -4,7 +4,7 @@ from src.db.models.game_model import Game
 from src.db.models.moves_model import MoveModel
 from sqlalchemy import select
 from src.core.game_manager import game_manager
-from src.enum.game_type import GameType
+from chess_core.enum.game_type import GameType
 
 
 class GamesController:
