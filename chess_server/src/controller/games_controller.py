@@ -4,6 +4,7 @@ from src.db.models.game_model import Game
 from src.db.models.moves_model import MoveModel
 from sqlalchemy import select
 from src.core.game_manager import game_manager
+from src.enum.game_type import GameType
 
 
 class GamesController:
@@ -17,16 +18,17 @@ class GamesController:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def create(db: AsyncSession, white_player_id: int, black_player_id: int) -> Game:
+    async def create(db: AsyncSession, white_player_id: int, black_player_id: int, type: GameType) -> Game:
         game = Game(
             white_player=white_player_id,
             black_player=black_player_id,
+            type=type
         )
         db.add(game)
         await db.commit()
         await db.refresh(game)
 
-        game_manager.create_session(game.id, white_player_id, black_player_id)
+        game_manager.create_session(game.id, white_player_id, black_player_id, type)
 
         return game
     

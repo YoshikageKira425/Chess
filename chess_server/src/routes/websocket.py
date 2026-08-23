@@ -8,6 +8,7 @@ from src.core.game_manager import game_manager
 from src.controller.games_controller import GamesController
 from src.controller.user_controller import UserController
 from chess_core.enum.color_enum import Color
+from src.enum.game_type import GameType
 
 active_connections: dict[int, dict[int, WebSocket]] = {}
 
@@ -96,7 +97,7 @@ async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
         white_id, black_id = opponent_id, player_id
         white_ws, black_ws = opponent_ws, websocket
 
-    game = await GamesController.create(db, white_id, black_id)
+    game = await GamesController.create(db, white_id, black_id, GameType.CASUAL)
     game_id = game.id
 
     active_connections[game_id] = {
