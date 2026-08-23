@@ -68,10 +68,7 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                 return
 
     except WebSocketDisconnect:
-        await broadcast(game_id, {"type": "opponent_disconnected"}, exclude_player=player_id)
-        await updated_elo(db, opponent_id, player_id)
-
-        active_connections.pop(game_id, None)
+        await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")
 
 
 async def game_socket(websocket: WebSocket, player_id: int, db: AsyncSession):
@@ -131,10 +128,11 @@ async def ending_match(
     game_id: int,
     winner_id: int,
     loser_id: int,
-    status: str
+    status: str,
+    type: str = "game_over"
 ):
     await broadcast(game_id, {
-        "type": "game_over",
+        "type": type,
         "status": status,
         "winner_id": winner_id
     })
