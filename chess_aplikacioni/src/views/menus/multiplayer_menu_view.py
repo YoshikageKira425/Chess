@@ -30,20 +30,23 @@ class MultiplayerMenuView(BaseMenuView):
 
     def _set_up_main_ui(self):
         casual_play_button = arcade.gui.UIFlatButton(
-            text="PLAY", x=300, y=340, width=200, height=55, style=BUTTTON_STYLE)
+            text="CASUAL PLAY", x=220, y=340, width=370, height=55, style=BUTTTON_STYLE)
+        ranked_play_button = arcade.gui.UIFlatButton(
+            text="RANKED PLAY", x=220, y=270, width=370, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
-            text="BACK", x=300, y=200, width=200, height=55, style=BUTTTON_STYLE)
+            text="BACK", x=300, y=130, width=200, height=55, style=BUTTTON_STYLE)
 
         account_label = account_manager.username or "ACCOUNT"
         self._account_button = arcade.gui.UIFlatButton(
             text=account_label, x=50, y=30, width=250, height=55, style=BUTTTON_STYLE)
 
         self._main_widget.add(casual_play_button)
+        self._main_widget.add(ranked_play_button)
         self._main_widget.add(back_button)
         self._main_widget.add(self._account_button)
 
         leaderboard_button = arcade.gui.UIFlatButton(
-            text="LEADERBOARD", x=220, y=270, width=370, height=55, style=BUTTTON_STYLE)
+            text="LEADERBOARD", x=220, y=200, width=370, height=55, style=BUTTTON_STYLE)
         self._main_widget.add(leaderboard_button)
 
         back_button_leaderboard = arcade.gui.UIFlatButton(
@@ -52,7 +55,11 @@ class MultiplayerMenuView(BaseMenuView):
 
         @casual_play_button.event("on_click")
         def play(*args):
-            self.play()
+            self.play(GameType.CASUAL)
+            
+        @ranked_play_button.event("on_click")
+        def play(*args):
+            self.play(GameType.RANKED)
 
         @back_button.event("on_click")
         def on_back(*args):
@@ -217,13 +224,13 @@ class MultiplayerMenuView(BaseMenuView):
             else:
                 self._status_label.text = "Username taken or password too short"
 
-    def play(self):
+    def play(self, type: GameType):
         player_id = account_manager.get_player_id()
         if not player_id:
             return
 
         from ..games.online_chess import OnlineGameView
-        self.window.show_view(OnlineGameView(player_id, GameType.CASUAL))
+        self.window.show_view(OnlineGameView(player_id, type))
 
     def back(self):
         from .main_menu_view import MainMenuView
