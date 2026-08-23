@@ -127,14 +127,16 @@ async def ending_match(
     status: str,
     type: str = "game_over"
 ):
+    game = game_manager.get_session(game_id)
+    if not game:
+        return
+    
     await broadcast(game_id, {
         "type": type,
         "status": status,
         "winner_id": winner_id
     })
-    await GamesController.end(db, game_id, winner_id=winner_id)
 
-    game = game_manager.get_session(game_id)
     if status in ["checkmate", "resign", "timeout"] and not game.is_casual_match():
         await UserController.update_elo(
             db,
@@ -147,5 +149,7 @@ async def ending_match(
             loser_id,
             -10
         )
+    
+    await GamesController.end(db, game_id, winner_id=winner_id)
 
     active_connections.pop(game_id, None)

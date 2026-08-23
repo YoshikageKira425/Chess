@@ -19,6 +19,7 @@ class OnlineGameView(BaseChess):
         self._my_turn = False
 
         self.player_id = player_id
+        self.type = type
 
         self.network = NetworkManager(player_id, type)
 
@@ -146,4 +147,4 @@ class OnlineGameView(BaseChess):
         self.pause_ui.pause(self._is_paused)
     
     def replay(self):
-        self.window.show_view(OnlineGameView(self.player_id))
+        self.window.show_view(OnlineGameView(self.player_id, self.type))

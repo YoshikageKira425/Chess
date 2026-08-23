@@ -16,10 +16,7 @@ class Game(Base):
         Enum(GameStatus),
         default=GameStatus.ON_GOING
     )
-    type: Mapped[GameType] = mapped_column(
-        Enum(GameType),
-        default=GameType.CASUAL
-    )
+    type: Mapped[GameType] = mapped_column(Enum(GameType))
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow
