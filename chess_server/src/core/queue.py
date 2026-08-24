@@ -17,6 +17,9 @@ class MatchmakingQueue:
 
             if queue:
                 opponent_id, opponent_ws, future = queue.pop(0)
+                if opponent_id == player_id:
+                    return None
+                
                 future.cancel()
                 return (opponent_id, opponent_ws)
             else:

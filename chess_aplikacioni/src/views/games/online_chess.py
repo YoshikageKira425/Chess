@@ -30,6 +30,7 @@ class OnlineGameView(BaseChess):
 
         self._is_paused = False
 
+        self.loading_ui.set_up_exit_button(self.cancel_match)
         self.pause_ui.set_up_ui_buttons(self.pause, self.disconnect)
         self.end_screen_ui.set_up_ui_buttons(self.replay, self.back)
 
@@ -66,6 +67,8 @@ class OnlineGameView(BaseChess):
                 case "game_over":
                     self._handle_game_over(data["status"], data.get("winner_id"))
                 case "opponent_disconnected":
+                    self.back()
+                case "cancelled":
                     self.back()
 
     def _handle_match_found(self, color: Color):
@@ -108,6 +111,9 @@ class OnlineGameView(BaseChess):
     def back(self):
         from ..menus.multiplayer_menu_view import MultiplayerMenuView
         self.window.show_view(MultiplayerMenuView())
+        
+    def cancel_match(self):
+        self.network.cancel_match_making()
 
     def on_piece_clicked(self, row: int, col: int):
         if self.is_match_finished or not self._my_turn:

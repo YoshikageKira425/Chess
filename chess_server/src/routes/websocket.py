@@ -77,7 +77,14 @@ async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType,
         await send(websocket, {"type": "waiting"})
 
         try:
-            await asyncio.Future()
+            while True:
+                raw = await websocket.receive_text()
+                data = json.loads(raw)
+                
+                if data.get("type") == "cancel":
+                    await matchmaking_queue.leave(player_id)
+                    await send(websocket, {"type": "cancelled"})
+                    return
         except asyncio.CancelledError:
             pass
         except WebSocketDisconnect:

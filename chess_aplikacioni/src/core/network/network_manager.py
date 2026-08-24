@@ -56,6 +56,9 @@ class NetworkManager:
         self._send({
             "type": "resign",
         })
+        
+    def cancel_match_making(self):
+        self._send({"type": "cancel"})
 
     def _send(self, data: dict):
         if self.websocket is None:
