@@ -91,6 +91,10 @@ async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType,
             await matchmaking_queue.leave(player_id)
             return
 
+    opponent = matchmaking_queue.get_opponent(player_id)
+    if opponent is None:
+        return
+
     opponent_id, opponent_ws = opponent
 
     if random.random() > 0.5:

@@ -5,10 +5,11 @@ from chess_core.enum.game_type import GameType
 
 class MatchmakingQueue:
     def __init__(self):
-        self._queues: dict[GameType, list[tuple[int, WebSocket, asyncio.Future]]] = {
+        self._queues: dict[GameType, list[tuple[int, WebSocket, asyncio.Task]]] = {
             GameType.CASUAL: [],
             GameType.RANKED: [],
         }
+        self._paired: dict[int, tuple[int, WebSocket]] = {}
         self._lock = asyncio.Lock()
 
     async def join(self, player_id: int, game_type: GameType, websocket: WebSocket) -> tuple | None:
@@ -16,16 +17,22 @@ class MatchmakingQueue:
             queue = self._queues[game_type]
 
             if queue:
-                opponent_id, opponent_ws, future = queue.pop(0)
+                opponent_id, opponent_ws, task = queue.pop(0)
                 if opponent_id == player_id:
                     return None
                 
-                future.cancel()
+                self._paired[player_id] = (opponent_id, opponent_ws)
+                self._paired[opponent_id] = (player_id, websocket)
+                
+                task.cancel()
                 return (opponent_id, opponent_ws)
             else:
-                future = asyncio.get_event_loop().create_future()
-                queue.append((player_id, websocket, future))
+                task = asyncio.current_task()
+                queue.append((player_id, websocket, task))
                 return None
+
+    def get_opponent(self, player_id: int) -> tuple | None:
+        return self._paired.pop(player_id, None)
 
     async def leave(self, player_id: int):
         async with self._lock:
