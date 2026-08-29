@@ -111,14 +111,14 @@ cd chess_server && uv sync && cd ..
 
 ```bash
 cd chess_aplikacioni
-python main.py
+uv run main.py
 ```
 
 ### Multiplayer server
 
 ```bash
 cd chess_server
-python main.py
+uv run uvicorn main:app --reload
 ```
 
 ## How to Play
