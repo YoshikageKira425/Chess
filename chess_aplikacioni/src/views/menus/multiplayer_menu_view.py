@@ -56,7 +56,7 @@ class MultiplayerMenuView(BaseMenuView):
         @casual_play_button.event("on_click")
         def play(*args):
             self.play(GameType.CASUAL)
-            
+
         @ranked_play_button.event("on_click")
         def play(*args):
             self.play(GameType.RANKED)
@@ -79,16 +79,16 @@ class MultiplayerMenuView(BaseMenuView):
             self.switch_to(self._main_widget)
 
     def _set_up_account(self):
-        signup_button = arcade.gui.UIFlatButton(
+        self.signup_button = arcade.gui.UIFlatButton(
             text="SIGN UP", x=285, y=340, width=230, height=55, style=BUTTTON_STYLE)
-        login_button = arcade.gui.UIFlatButton(
+        self.login_button = arcade.gui.UIFlatButton(
             text="LOG IN", x=285, y=270, width=230, height=55, style=BUTTTON_STYLE)
-        logout_button = arcade.gui.UIFlatButton(
+        self.logout_button = arcade.gui.UIFlatButton(
             text="LOG OUT", x=285, y=200, width=230, height=55, style=BUTTTON_STYLE)
         back_button = arcade.gui.UIFlatButton(
             text="BACK", x=300, y=130, width=200, height=55, style=BUTTTON_STYLE)
-        
-        toggle_on  = arcade.load_texture("assets/ui/toggle_on.png")
+
+        toggle_on = arcade.load_texture("assets/ui/toggle_on.png")
         toggle_off = arcade.load_texture("assets/ui/toggle_off.png")
 
         _save_me_toggle = arcade.gui.UITextureToggle(
@@ -96,7 +96,7 @@ class MultiplayerMenuView(BaseMenuView):
             off_texture=toggle_off,
             x=50, y=50,
             width=50, height=50,
-            value=True
+            value=account_manager.remeber_me
         )
         _save_me_label = arcade.gui.UILabel(
             text="REMEMBER ME",
@@ -106,14 +106,17 @@ class MultiplayerMenuView(BaseMenuView):
             text_color=arcade.color.WHITE
         )
 
-        self._account_widget.add(signup_button)
-        self._account_widget.add(login_button)
-        self._account_widget.add(logout_button)
+        if account_manager.is_logged_in():
+            self._account_widget.add(self.logout_button)
+        else:
+            self._account_widget.add(self.signup_button)
+            self._account_widget.add(self.login_button)
+            
         self._account_widget.add(back_button)
         self._account_widget.add(_save_me_toggle)
         self._account_widget.add(_save_me_label)
 
-        @signup_button.event("on_click")
+        @self.signup_button.event("on_click")
         def on_signup(*args):
             self._form_mode = "signup"
             self._form_title.text = "SIGN UP"
@@ -122,7 +125,7 @@ class MultiplayerMenuView(BaseMenuView):
             self.password_input.text = ""
             self.switch_to(self._form_widget)
 
-        @login_button.event("on_click")
+        @self.login_button.event("on_click")
         def on_login(*args):
             self._form_mode = "login"
             self._form_title.text = "LOG IN"
@@ -131,16 +134,14 @@ class MultiplayerMenuView(BaseMenuView):
             self.password_input.text = ""
             self.switch_to(self._form_widget)
 
-        @logout_button.event("on_click")
+        @self.logout_button.event("on_click")
         def on_logout(*args):
-            account_manager.logout()
-            self._account_button.text = "ACCOUNT"
-            self.switch_to(self._main_widget)
+            self._logout()
 
         @back_button.event("on_click")
         def on_back(*args):
             self.switch_to(self._main_widget)
-            
+
         @_save_me_toggle.event("on_change")
         def on_toggle_change(event):
             self._on_save_me_changed(event.new_value)
@@ -209,20 +210,34 @@ class MultiplayerMenuView(BaseMenuView):
         if self._form_mode == "login":
             success = account_manager.login(username, password)
             if success:
-                self._account_button.text = account_manager.username
-                self._status_label.text = ""
-                self.switch_to(self._main_widget)
+                self._success_with_log_in()
             else:
                 self._status_label.text = "Invalid credentials"
 
         elif self._form_mode == "signup":
             success = account_manager.signup(username, password)
             if success:
-                self._account_button.text = account_manager.username
-                self._status_label.text = ""
-                self.switch_to(self._main_widget)
+                self._success_with_log_in()
             else:
                 self._status_label.text = "Username taken or password too short"
+
+    def _success_with_log_in(self):
+        self._account_button.text = account_manager.username
+        self._status_label.text = ""
+        self.switch_to(self._main_widget)
+
+        self._account_widget.remove(self.signup_button)
+        self._account_widget.remove(self.login_button)
+        self._account_widget.add(self.logout_button)
+
+    def _logout(self):
+        account_manager.logout()
+        self._account_button.text = "ACCOUNT"
+        self.switch_to(self._main_widget)
+
+        self._account_widget.add(self.signup_button)
+        self._account_widget.add(self.login_button)
+        self._account_widget.remove(self.logout_button)
 
     def play(self, type: GameType):
         player_id = account_manager.get_player_id()
