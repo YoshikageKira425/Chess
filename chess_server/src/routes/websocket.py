@@ -12,13 +12,16 @@ from chess_core.enum.game_type import GameType
 
 active_connections: dict[int, dict[int, WebSocket]] = {}
 
+
 async def send(ws: WebSocket, data: dict):
     await ws.send_text(json.dumps(data))
+
 
 async def broadcast(game_id: int, data: dict, exclude_player: int = None):
     for player_id, ws in active_connections.get(game_id, {}).items():
         if player_id != exclude_player:
             await send(ws, data)
+
 
 async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, game_id: int, db: AsyncSession):
     """Handles the game loop for a single player."""
@@ -68,10 +71,12 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
     except WebSocketDisconnect:
         await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")
 
+
 async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType, db: AsyncSession):
     await websocket.accept()
 
     opponent = await matchmaking_queue.join(player_id, type_game, websocket)
+    is_second = False
 
     if opponent is None:
         await send(websocket, {"type": "waiting"})
@@ -80,19 +85,28 @@ async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType,
             while True:
                 raw = await websocket.receive_text()
                 data = json.loads(raw)
-                
+
                 if data.get("type") == "cancel":
                     await matchmaking_queue.leave(player_id)
                     await send(websocket, {"type": "cancelled"})
                     return
         except asyncio.CancelledError:
-            pass
+            is_second = True
         except WebSocketDisconnect:
             await matchmaking_queue.leave(player_id)
             return
 
-    opponent = matchmaking_queue.get_opponent(player_id)
-    if opponent is None:
+    if is_second:
+        _opponent = matchmaking_queue.get_opponent(player_id)
+        if _opponent is None:
+            return
+
+        opponent_id, _ = _opponent
+        game_id = await matchmaking_queue.wait_for_game(player_id)
+        if game_id is None:
+            return
+
+        await handle_player(websocket, player_id, opponent_id, game_id, db)
         return
 
     opponent_id, opponent_ws = opponent
@@ -112,6 +126,9 @@ async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType,
         black_id: black_ws,
     }
 
+    matchmaking_queue.set_game_id(opponent_id, game_id)
+
+    print(player_id)
     await send(white_ws, {
         "type": "match_found",
         "game_id": game_id,
@@ -125,10 +142,8 @@ async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType,
         "opponent_id": white_id,
     })
 
-    await asyncio.gather(
-        handle_player(white_ws, white_id, black_id, game_id, db),
-        handle_player(black_ws, black_id, white_id, game_id, db),
-    )
+    await handle_player(websocket, player_id, opponent_id, game_id, db)
+
 
 async def ending_match(
     db: AsyncSession,
@@ -141,7 +156,7 @@ async def ending_match(
     game = game_manager.get_session(game_id)
     if not game:
         return
-    
+
     await broadcast(game_id, {
         "type": type,
         "status": status,
@@ -160,7 +175,7 @@ async def ending_match(
             loser_id,
             -10
         )
-    
+
     await GamesController.end(db, game_id, winner_id=winner_id)
 
     active_connections.pop(game_id, None)
