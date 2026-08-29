@@ -9,6 +9,7 @@ from src.controller.games_controller import GamesController
 from src.controller.user_controller import UserController
 from chess_core.enum.color_enum import Color
 from chess_core.enum.game_type import GameType
+from chess_core.enum.pieces_enum import Pieces
 
 active_connections: dict[int, dict[int, WebSocket]] = {}
 
@@ -53,9 +54,11 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                 await broadcast(game_id, {
                     "type": "move",
                     "from": from_pos,
-                    "to": to_pos,
-                    "status": result["status"],
+                    "to": to_pos
                 }, exclude_player=player_id)
+                
+                if result["status"] == "promotion":
+                    await send(websocket, {"type": "promotion"})
 
                 if result["status"] in ("checkmate", "stalemate"):
                     loser_id = opponent_id if player_id == result.get(
@@ -67,6 +70,9 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
             elif data["type"] == "resign":
                 await ending_match(db, game_id, opponent_id, player_id, "resign")
                 return
+            
+            elif data["type"] == "promotion":
+                await GamesController.promote(game_id, Pieces(data.get("type")))
 
     except WebSocketDisconnect:
         await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")

@@ -1,6 +1,8 @@
 from chess_core.board import Board
 from chess_core.enum.color_enum import Color
 from chess_core.enum.game_type import GameType
+from chess_core.enum.pieces_enum import Pieces
+
 
 class GameSession:
     def __init__(self, game_id: int, white_player_id: int, black_player_id: int, type: GameType):
@@ -8,7 +10,7 @@ class GameSession:
         self.white_player_id = white_player_id
         self.black_player_id = black_player_id
         self.type = type
-        
+
         self.board = Board()
         self.turn = Color.WHITE
 
@@ -39,8 +41,21 @@ class GameSession:
         if self.board.is_stalemate(next_turn):
             return {"success": True, "status": "stalemate"}
 
+        if self.board.is_promotion():
+            return {"success": True, "status": "promotion"}
+
         self.turn = next_turn
         return {"success": True, "status": "continue"}
+
+    def promote(self, type: Pieces) -> bool:
+        if not type:
+            return False
+
+        if self.board.is_promotion():
+            return False
+
+        self.board.promote(type)
+        return True
 
 
 class GameManager:
@@ -57,5 +72,6 @@ class GameManager:
 
     def remove_session(self, game_id: int):
         self._sessions.pop(game_id, None)
+
 
 game_manager = GameManager()
