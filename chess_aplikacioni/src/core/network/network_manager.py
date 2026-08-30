@@ -5,6 +5,7 @@ from queue import Queue
 import websockets
 from src.constants import SERVER_WS
 from chess_core.enum.game_type import GameType
+from chess_core.enum.pieces_enum import Pieces
 
 class NetworkManager:
     def __init__(self, player_id: int, type: GameType):
@@ -50,6 +51,12 @@ class NetworkManager:
             "type": "move",
             "from": from_pos,
             "to": to_pos,
+        })
+        
+    def send_promotion(self, type:Pieces):
+        self._send({
+            "type": "promotion",
+            "piece_type": type
         })
 
     def resign(self):

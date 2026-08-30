@@ -72,7 +72,7 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                 return
             
             elif data["type"] == "promotion":
-                await GamesController.promote(game_id, Pieces(data.get("type")))
+                await GamesController.promote(game_id, Pieces(data.get("piece_type")))
 
     except WebSocketDisconnect:
         await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")

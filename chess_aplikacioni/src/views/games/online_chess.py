@@ -5,10 +5,12 @@ from src.ui.online_information_ui import OnlineInformationUI
 from src.ui.end_screen_ui import EndScreenUi
 from src.ui.finding_match_ui import FindingMatchUI
 from src.ui.pause_online_ui import PauseUi
+from src.ui.promotion_ui import PromotionUi
 from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
 from src.core.ai.evaluator import evaluate
 from chess_core.enum.color_enum import Color
 from chess_core.enum.game_type import GameType
+from chess_core.enum.pieces_enum import Pieces
 
 
 class OnlineGameView(BaseChess):
@@ -27,6 +29,7 @@ class OnlineGameView(BaseChess):
         self.loading_ui = FindingMatchUI()
         self.pause_ui = PauseUi()
         self.end_screen_ui = EndScreenUi()
+        self.promotion_ui = PromotionUi()
 
         self._is_paused = False
 
@@ -51,6 +54,7 @@ class OnlineGameView(BaseChess):
             self.ui.draw()
             self.pause_ui.draw()
             self.end_screen_ui.draw()
+            self.promotion_ui.draw()
         else:
             self.clear()
             self.loading_ui.draw()
@@ -64,6 +68,8 @@ class OnlineGameView(BaseChess):
                     self._handle_match_found(Color(data["color"]))
                 case "move":
                     self._handle_opponent_move(data["from"], data["to"])
+                case "promotion":
+                    self._handle_promotion()
                 case "game_over":
                     self._handle_game_over(data["status"], data.get("winner_id"))
                 case "opponent_disconnected":
@@ -85,6 +91,9 @@ class OnlineGameView(BaseChess):
 
         self._my_turn = True
         self.information.set_turn(self.my_color)
+        
+    def _handle_promotion(self):
+        self.promotion_ui.show_promotion(self.promote)
 
     def _handle_game_over(self, status: str, winner_id: int):
         self.is_match_finished = True
@@ -102,6 +111,9 @@ class OnlineGameView(BaseChess):
             self.end_screen_ui.show_end_screen()
         else:
             self.end_screen_ui.show_end_screen(custom_label="Resigned")
+
+    def promote(self, type: Pieces):
+        pass
 
     def disconnect(self):
         self.network.resign()
