@@ -48,12 +48,6 @@ class GameSession:
         return {"success": True, "status": "continue"}
 
     def promote(self, type: Pieces) -> bool:
-        if not type:
-            return False
-
-        if self.board.is_promotion():
-            return False
-
         self.board.promote(type)
         return True
 

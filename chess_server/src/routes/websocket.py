@@ -56,9 +56,9 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                     "from": from_pos,
                     "to": to_pos
                 }, exclude_player=player_id)
-                
+
                 if result["status"] == "promotion":
-                    await send(websocket, {"type": "promotion"})
+                    await send(websocket, {"type": "pawn_promotion"})
 
                 if result["status"] in ("checkmate", "stalemate"):
                     loser_id = opponent_id if player_id == result.get(
@@ -70,9 +70,19 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
             elif data["type"] == "resign":
                 await ending_match(db, game_id, opponent_id, player_id, "resign")
                 return
-            
+
             elif data["type"] == "promotion":
-                await GamesController.promote(game_id, Pieces(data.get("piece_type")))
+                type = Pieces(data.get("piece_type"))
+                result = await GamesController.promote(game_id, type)
+
+                if not result["success"]:
+                    await send(websocket, {"type": "error", "reason": result["reason"]})
+                    continue
+
+                await broadcast(game_id, {
+                    "type": "opponent_promotion",
+                    "piece_type": type
+                }, exclude_player=player_id)
 
     except WebSocketDisconnect:
         await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")

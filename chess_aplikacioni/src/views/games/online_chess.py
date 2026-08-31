@@ -68,7 +68,9 @@ class OnlineGameView(BaseChess):
                     self._handle_match_found(Color(data["color"]))
                 case "move":
                     self._handle_opponent_move(data["from"], data["to"])
-                case "promotion":
+                case "opponent_promotion":
+                    self._handle_opponent_promotion(Pieces(data["piece_type"]))
+                case "pawn_promotion":
                     self._handle_promotion()
                 case "game_over":
                     self._handle_game_over(data["status"], data.get("winner_id"))
@@ -92,6 +94,10 @@ class OnlineGameView(BaseChess):
         self._my_turn = True
         self.information.set_turn(self.my_color)
         
+    def _handle_opponent_promotion(self, type: Pieces):
+        self.board.promote(type)
+        self.updated_visuals(evaluate(self.board))
+        
     def _handle_promotion(self):
         self.promotion_ui.show_promotion(self.promote)
 
@@ -113,7 +119,10 @@ class OnlineGameView(BaseChess):
             self.end_screen_ui.show_end_screen(custom_label="Resigned")
 
     def promote(self, type: Pieces):
-        pass
+        self.network.send_promotion(type)
+        
+        self.board.promote(type)
+        self.updated_visuals(evaluate(self.board))
 
     def disconnect(self):
         self.network.resign()
