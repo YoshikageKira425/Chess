@@ -48,7 +48,7 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                 result = await GamesController.add_move(db, game_id, from_pos, to_pos, player_id)
 
                 if not result["success"]:
-                    await send(websocket, {"type": "error", "reason": result["reason"]})
+                    await send(websocket, {"type": "invalid_move", "reason": result["reason"]})
                     continue
 
                 await broadcast(game_id, {

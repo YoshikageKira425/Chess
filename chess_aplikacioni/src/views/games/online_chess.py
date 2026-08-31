@@ -77,6 +77,8 @@ class OnlineGameView(BaseChess):
                     self.back()
                 case "cancelled":
                     self.back()
+                case "invalid_move":
+                    self.undo_invalid_move()
                 case "error":
                     print(data["reason"])
 
@@ -118,6 +120,10 @@ class OnlineGameView(BaseChess):
             self.end_screen_ui.show_end_screen()
         else:
             self.end_screen_ui.show_end_screen(custom_label="Resigned")
+
+    def undo_invalid_move(self):
+        self.board.undo()
+        self.updated_visuals(evaluate(self.board))
 
     def promote(self, type: Pieces):
         self.network.send_promotion(type)
