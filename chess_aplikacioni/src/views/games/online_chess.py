@@ -17,7 +17,6 @@ class OnlineGameView(BaseChess):
         super().__init__()
 
         self._showing_visuals = False
-        self._my_turn = False
 
         self.player_id = player_id
         self.type = type
@@ -58,6 +57,9 @@ class OnlineGameView(BaseChess):
             self.clear()
             self.loading_ui.draw()
 
+    def _is_my_turn(self) -> bool:
+        return self.turn == self.my_color
+
     def _process_network_events(self):
         while not self.network.events.empty():
             data = self.network.events.get()
@@ -87,19 +89,19 @@ class OnlineGameView(BaseChess):
 
         self.my_color = color
         self.ui.set_color(self.my_color)
-        self._my_turn = self.my_color == Color.WHITE
+        self.turn = Color.WHITE
 
     def _handle_opponent_move(self, from_pos: tuple, to_pos: tuple):
         self.board.move(tuple(from_pos), tuple(to_pos))
+        self.turn = self.my_color
         self.updated_visuals(evaluate(self.board))
+        
         self._stop_moving()
-
-        self._my_turn = True
-        self.information.set_turn(self.my_color)
         
     def _handle_opponent_promotion(self, type: Pieces):
         self.board.promote(type)
         self.updated_visuals(evaluate(self.board))
+        self.turn = self.my_color
         
     def _handle_promotion(self):
         self.promotion_ui.show_promotion(self.promote)
@@ -124,6 +126,8 @@ class OnlineGameView(BaseChess):
     def undo_invalid_move(self):
         self.board.undo()
         self.updated_visuals(evaluate(self.board))
+        
+        self.turn = self.my_color
 
     def promote(self, type: Pieces):
         self.network.send_promotion(type)
@@ -144,7 +148,10 @@ class OnlineGameView(BaseChess):
         self.network.cancel_match_making()
 
     def on_piece_clicked(self, row: int, col: int):
-        if self.is_match_finished or not self._my_turn:
+        if self.is_match_finished:
+            return
+
+        if not self._is_my_turn():
             return
 
         if self.selected:
@@ -166,15 +173,14 @@ class OnlineGameView(BaseChess):
         if not self.board.is_valid_move(from_pos, to_pos):
             return
 
-        self._my_turn = False
         self.network.send_move(from_pos, to_pos)
 
         self.board.move(from_pos, to_pos)
         self.visual.update_board(self.board.grid, self.on_piece_clicked)
 
+        self.turn = self.my_color.inverted()
         self.updated_visuals(evaluate(self.board))
         self._stop_moving()
-        self.information.set_turn(self.my_color.inverted())
 
     def pause(self):
         self._is_paused = not self._is_paused
