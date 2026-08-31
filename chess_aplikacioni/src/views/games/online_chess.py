@@ -6,7 +6,6 @@ from src.ui.end_screen_ui import EndScreenUi
 from src.ui.finding_match_ui import FindingMatchUI
 from src.ui.pause_online_ui import PauseUi
 from src.ui.promotion_ui import PromotionUi
-from src.constants import BOARD_OFFSET_X, BOARD_OFFSET_Y
 from src.core.ai.evaluator import evaluate
 from chess_core.enum.color_enum import Color
 from chess_core.enum.game_type import GameType
@@ -78,6 +77,8 @@ class OnlineGameView(BaseChess):
                     self.back()
                 case "cancelled":
                     self.back()
+                case "error":
+                    print(data["reason"])
 
     def _handle_match_found(self, color: Color):
         self._showing_visuals = True

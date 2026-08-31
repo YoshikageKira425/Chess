@@ -78,13 +78,9 @@ class GamesController:
         return result
 
     @staticmethod
-    async def promote(game_id: int, type: Pieces) -> dict:
+    async def promote(game_id: int, piece_type: Pieces) -> dict:
         session = game_manager.get_session(game_id)
-
         if session is None:
             return {"success": False, "reason": "game not found"}
-        
-        if not session.promote(type):
-            return {"success": False, "reason": "failed to promote"}
-        
-        return {"success": True}
+
+        return session.apply_promotion(piece_type)

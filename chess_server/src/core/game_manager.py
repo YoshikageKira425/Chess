@@ -33,6 +33,9 @@ class GameSession:
             self.board.undo()
             return {"success": False, "reason": "move leaves king in check"}
 
+        if self.board.is_promotion():
+            return {"success": True, "status": "promotion"}
+
         next_turn = Color.BLACK if self.turn == Color.WHITE else Color.WHITE
 
         if self.board.is_checkmate(next_turn):
@@ -41,15 +44,22 @@ class GameSession:
         if self.board.is_stalemate(next_turn):
             return {"success": True, "status": "stalemate"}
 
-        if self.board.is_promotion():
-            return {"success": True, "status": "promotion"}
-
         self.turn = next_turn
         return {"success": True, "status": "continue"}
 
-    def promote(self, type: Pieces) -> bool:
-        self.board.promote(type)
-        return True
+    def apply_promotion(self, piece_type: Pieces) -> dict:
+        self.board.promote(piece_type)
+
+        next_turn = Color.BLACK if self.turn == Color.WHITE else Color.WHITE
+
+        if self.board.is_checkmate(next_turn):
+            return {"success": True, "status": "checkmate", "winner_id": self.get_current_player_id()}
+
+        if self.board.is_stalemate(next_turn):
+            return {"success": True, "status": "stalemate"}
+
+        self.turn = next_turn  
+        return {"success": True, "status": "continue"}
 
 
 class GameManager:

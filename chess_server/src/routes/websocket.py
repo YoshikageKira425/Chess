@@ -83,6 +83,11 @@ async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, 
                     "type": "opponent_promotion",
                     "piece_type": type
                 }, exclude_player=player_id)
+                
+                if result["status"] in ("checkmate", "stalemate"):
+                    loser_id = opponent_id if player_id == result.get("winner_id") else player_id
+                    await ending_match(db, game_id, result.get("winner_id"), loser_id, result["status"])
+                    return
 
     except WebSocketDisconnect:
         await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")
