@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
 from src.db.models.game_model import Game
-from src.db.models.moves_model import MoveModel
 from sqlalchemy import select
 from src.core.game_manager import game_manager
 from chess_core.enum.game_type import GameType
@@ -31,7 +30,6 @@ class GamesController:
 
         game_manager.create_session(
             game.id, white_player_id, black_player_id, type)
-        print(f"INFO: {game.id}")
 
         return game
 
@@ -61,20 +59,11 @@ class GamesController:
         if not result["success"]:
             return result
 
-        from_row, from_col = from_pos
-        to_row, to_col = to_pos
-
-        move = MoveModel(game_id=game_id, from_col=from_col,
-                         from_row=from_row, to_col=to_col, to_row=to_row)
-
         if result["status"] == "checkmate":
             GamesController.end(db, game_id, result["winner_id"])
         elif result["status"] == "stalemate":
             GamesController.end(db, game_id, None, True)
-
-        db.add(move)
-        await db.commit()
-
+            
         return result
 
     @staticmethod

@@ -125,9 +125,9 @@ class OnlineGameView(BaseChess):
 
     def undo_invalid_move(self):
         self.board.undo()
-        self.updated_visuals(evaluate(self.board))
         
         self.turn = self.my_color
+        self.updated_visuals(evaluate(self.board))
 
     def promote(self, type: Pieces):
         self.network.send_promotion(type)
