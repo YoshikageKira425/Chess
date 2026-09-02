@@ -3,17 +3,12 @@ import arcade.gui
 from src.constants import BUTTTON_STYLE
 from ..base.base_menu_view import BaseMenuView
 from src.core.network.account_manager import account_manager
-from src.ui.leaderboard_ui import LeaderboardUI
-from src.core.network.leaderboard import Leaderboard
 from chess_core.enum.game_type import GameType
 
 
 class MultiplayerMenuView(BaseMenuView):
     def __init__(self):
         super().__init__()
-
-        self._leaderboard_ui = LeaderboardUI()
-        self._leaderboard_widget = self._leaderboard_ui.get_widget()
 
         self._main_widget = arcade.gui.UIWidget()
 
@@ -43,10 +38,6 @@ class MultiplayerMenuView(BaseMenuView):
             text="LEADERBOARD", x=220, y=200, width=370, height=55, style=BUTTTON_STYLE)
         self._main_widget.add(leaderboard_button)
 
-        back_button_leaderboard = arcade.gui.UIFlatButton(
-            text="BACK", x=300, y=10, width=200, height=55, style=BUTTTON_STYLE)
-        self._leaderboard_widget.add(back_button_leaderboard)
-
         @casual_play_button.event("on_click")
         def play(*args):
             self.play(GameType.CASUAL)
@@ -65,12 +56,7 @@ class MultiplayerMenuView(BaseMenuView):
 
         @leaderboard_button.event("on_click")
         def on_leaderboard(*args):
-            self.switch_to(self._leaderboard_widget)
-            self._leaderboard_ui.set_data(Leaderboard.gettin_top_ten())
-
-        @back_button_leaderboard.event("on_click")
-        def on_back(*args):
-            self.switch_to(self._main_widget)
+            self.leaderboard()
 
     def play(self, type: GameType):
         player_id = account_manager.get_player_id()
@@ -79,6 +65,10 @@ class MultiplayerMenuView(BaseMenuView):
 
         from ..games.online_chess import OnlineGameView
         self.window.show_view(OnlineGameView(player_id, type))
+
+    def leaderboard(self):
+        from .leaderboard_view import LeaderboardView
+        self.window.show_view(LeaderboardView())
 
     def account(self):
         from .auth_menu_view import AuthMenuView
