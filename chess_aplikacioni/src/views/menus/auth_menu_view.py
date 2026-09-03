@@ -152,33 +152,19 @@ class AuthMenuView(BaseMenuView):
         if self._form_mode == "login":
             success = account_manager.login(username, password)
             if success:
-                self._success_with_log_in()
+                self.back()
             else:
                 self._status_label.text = "Invalid credentials"
         elif self._form_mode == "signup":
             success = account_manager.signup(username, password)
             if success:
-                self._success_with_log_in()
+                self.back()
             else:
                 self._status_label.text = "Username taken or password too short"
 
-    def _success_with_log_in(self):
-        self._account_button.text = account_manager.username
-        self._status_label.text = ""
-        self.switch_to(self._main_widget)
-
-        self._account_widget.remove(self.signup_button)
-        self._account_widget.remove(self.login_button)
-        self._account_widget.add(self.logout_button)
-
     def _logout(self):
         account_manager.logout()
-        self._account_button.text = "ACCOUNT"
-        self.switch_to(self._main_widget)
-
-        self._account_widget.add(self.signup_button)
-        self._account_widget.add(self.login_button)
-        self._account_widget.remove(self.logout_button)
+        self.back()
 
     def _on_save_me_changed(self, value: bool):
         account_manager.remeber_me = value

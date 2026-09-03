@@ -4,18 +4,21 @@ from src.core.network.account_manager import account_manager
 from src.constants import BUTTTON_STYLE
 from src.core.network.leaderboard import Leaderboard
 
+
 class LeaderboardView(BaseMenuView):
     def __init__(self):
         super().__init__()
-        
+
         self._main_widget = arcade.gui.UIWidget()
         self._rows: list[arcade.gui.UIWidget] = []
-        
+
         self.username = account_manager.username
+        self.users_elo = Leaderboard.get_user_elo(
+            account_manager.get_player_id())
 
         self._set_up_ui()
         self._set_data(Leaderboard.gettin_top_ten())
-        
+
         self._active_widget = self._main_widget
         self._manager.add(self._active_widget)
 
@@ -32,10 +35,16 @@ class LeaderboardView(BaseMenuView):
             text="ELO", font_size=20, font_name="BoldPixels",
             x=530, y=470
         ))
-        
+
+        if self.username:
+            self._main_widget.add(arcade.gui.UILabel(
+                text=f"{self.username} elo: {self.users_elo}", font_size=20, font_name="BoldPixels",
+                x=30, y=30
+            ))
+
         back_button = arcade.gui.UIFlatButton(
-            text="BACK", x=300, y=10, 
-            width=200, height=55, 
+            text="BACK", x=300, y=10,
+            width=200, height=55,
             style=BUTTTON_STYLE
         )
         self._main_widget.add(back_button)
@@ -47,7 +56,7 @@ class LeaderboardView(BaseMenuView):
 
         self._rows_container = arcade.gui.UIWidget()
         self._main_widget.add(self._rows_container)
-        
+
         @back_button.event("on_click")
         def on_back(*args):
             self.back()
@@ -55,7 +64,8 @@ class LeaderboardView(BaseMenuView):
     def _add_row(self, rank: int, username: str, elo: str, index: int):
         y = 430 - (index * 38)
 
-        row_bg_color = (40, 43, 63, 180) if index % 2 == 0 else (30, 33, 50, 180)
+        row_bg_color = (40, 43, 63, 180) if index % 2 == 0 else (
+            30, 33, 50, 180)
 
         if username == account_manager.username:
             row_bg_color = (66, 72, 107, 180)
@@ -97,11 +107,12 @@ class LeaderboardView(BaseMenuView):
     def _set_data(self, players: list[dict]):
         if not players:
             return
-        
+
         self._rows_container.clear()
         for i, player in enumerate(players[:10]):
-            self._add_row(i + 1, player["username"], str(int(player["elo"])), i)
-            
+            self._add_row(i + 1, player["username"],
+                          str(int(player["elo"])), i)
+
     def back(self):
         from .multiplayer_menu_view import MultiplayerMenuView
         self.window.show_view(MultiplayerMenuView())
