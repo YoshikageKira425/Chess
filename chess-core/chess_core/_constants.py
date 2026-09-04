@@ -1,0 +1,3 @@
+HIGHLIGHT_SELECTED = (255, 215, 0,  140)   # gold
+HIGHLIGHT_MOVE = (49, 99, 49, 180)   # green
+HIGHLIGHT_CAPTURE = (220,  60,  60, 140)  # red

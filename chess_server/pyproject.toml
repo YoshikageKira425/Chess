@@ -1,0 +1,25 @@
+[project]
+name = "chess-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "alembic>=1.18.5",
+    "asyncpg>=0.31.0",
+    "bcrypt>=5.0.0",
+    "chess-core",
+    "dotenv>=0.9.9",
+    "fastapi>=0.141.1",
+    "pydantic>=2.13.4",
+    "pyjwt>=2.13.0",
+    "python-dotenv>=1.2.2",
+    "redis>=8.1.0",
+    "sqlalchemy>=2.0.51",
+    "uvicorn>=0.52.0",
+    "websockets>=17.0",
+]
+
+[tool.uv.sources]
+chess-core = { path = "../chess-core", editable = true }

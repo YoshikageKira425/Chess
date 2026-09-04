@@ -1,0 +1,190 @@
+import arcade
+from src.core.network.network_manager import NetworkManager
+from ..base.base_chess_view import BaseChess
+from src.ui.online_information_ui import OnlineInformationUI
+from src.ui.end_screen_ui import EndScreenUi
+from src.ui.finding_match_ui import FindingMatchUI
+from src.ui.pause_online_ui import PauseUi
+from src.ui.promotion_ui import PromotionUi
+from src.core.ai.evaluator import evaluate
+from chess_core.enum.color_enum import Color
+from chess_core.enum.game_type import GameType
+from chess_core.enum.pieces_enum import Pieces
+
+
+class OnlineGameView(BaseChess):
+    def __init__(self, player_id: int, type: GameType):
+        super().__init__()
+
+        self._showing_visuals = False
+
+        self.player_id = player_id
+        self.type = type
+
+        self.network = NetworkManager(player_id, type)
+
+        self.ui = OnlineInformationUI()
+        self.loading_ui = FindingMatchUI()
+        self.pause_ui = PauseUi()
+        self.end_screen_ui = EndScreenUi()
+        self.promotion_ui = PromotionUi()
+
+        self._is_paused = False
+
+        self.loading_ui.set_up_exit_button(self.cancel_match)
+        self.pause_ui.set_up_ui_buttons(self.pause, self.disconnect)
+        self.end_screen_ui.set_up_ui_buttons(self.replay, self.back)
+
+    def on_update(self, delta_time: float):
+        self.end_screen_ui.update(delta_time)
+        self.pause_ui.update(delta_time)
+        
+        self._process_network_events()
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol in [arcade.key.TAB, arcade.key.ESCAPE, arcade.key.P] and not self.is_match_finished:
+            self.pause()
+
+    def on_draw(self):
+        if self._showing_visuals:
+            super().on_draw()
+
+            self.ui.draw()
+            self.pause_ui.draw()
+            self.end_screen_ui.draw()
+            self.promotion_ui.draw()
+        else:
+            self.clear()
+            self.loading_ui.draw()
+
+    def _is_my_turn(self) -> bool:
+        return self.turn == self.my_color
+
+    def _process_network_events(self):
+        while not self.network.events.empty():
+            data = self.network.events.get()
+            
+            match data.get("type"):
+                case "match_found":
+                    self._handle_match_found(Color(data["color"]))
+                case "move":
+                    self._handle_opponent_move(data["from"], data["to"])
+                case "opponent_promotion":
+                    self._handle_opponent_promotion(Pieces(data["piece_type"]))
+                case "pawn_promotion":
+                    self._handle_promotion()
+                case "game_over":
+                    self._handle_game_over(data["status"], data.get("winner_id"))
+                case "opponent_disconnected":
+                    self.back()
+                case "cancelled":
+                    self.back()
+                case "invalid_move":
+                    self.undo_invalid_move()
+                case "error":
+                    print(data["reason"])
+
+    def _handle_match_found(self, color: Color):
+        self._showing_visuals = True
+
+        self.my_color = color
+        self.ui.set_color(self.my_color)
+        self.turn = Color.WHITE
+
+    def _handle_opponent_move(self, from_pos: tuple, to_pos: tuple):
+        self.board.move(tuple(from_pos), tuple(to_pos))
+        self.turn = self.my_color
+        self.updated_visuals(evaluate(self.board))
+        
+        self._stop_moving()
+        
+    def _handle_opponent_promotion(self, type: Pieces):
+        self.board.promote(type)
+        self.updated_visuals(evaluate(self.board))
+        self.turn = self.my_color
+        
+    def _handle_promotion(self):
+        self.promotion_ui.show_promotion(self.promote)
+
+    def _handle_game_over(self, status: str, winner_id: int):
+        self.is_match_finished = True
+
+        if status == "checkmate":
+            color = None
+
+            if winner_id == self.player_id:
+                color = self.my_color
+            else:
+                color = self.my_color.inverted()
+
+            self.end_screen_ui.show_end_screen(color)
+        elif status == "stalemate":
+            self.end_screen_ui.show_end_screen()
+        else:
+            self.end_screen_ui.show_end_screen(custom_label="Resigned")
+
+    def undo_invalid_move(self):
+        self.board.undo()
+        
+        self.turn = self.my_color
+        self.updated_visuals(evaluate(self.board))
+
+    def promote(self, type: Pieces):
+        self.network.send_promotion(type)
+        
+        self.board.promote(type)
+        self.updated_visuals(evaluate(self.board))
+
+    def disconnect(self):
+        self.network.resign()
+        
+        self.back()
+
+    def back(self):
+        from ..menus.multiplayer_menu_view import MultiplayerMenuView
+        self.window.show_view(MultiplayerMenuView())
+        
+    def cancel_match(self):
+        self.network.cancel_match_making()
+
+    def on_piece_clicked(self, row: int, col: int):
+        if self.is_match_finished:
+            return
+
+        if not self._is_my_turn():
+            return
+
+        if self.selected:
+            self.move_piece(self.selected, (row, col))
+            self._stop_moving()
+            return
+
+        piece = self.board.get(row, col)
+        if piece is None:
+            return
+
+        if piece.color != self.my_color:
+            return
+
+        self.selected = (row, col)
+        self._update_highlights()
+
+    def move_piece(self, from_pos, to_pos):
+        if not self.board.is_valid_move(from_pos, to_pos):
+            return
+
+        self.network.send_move(from_pos, to_pos)
+
+        self.board.move(from_pos, to_pos)
+        self.visual.update_board(self.board.grid, self.on_piece_clicked)
+
+        self.turn = self.my_color.inverted()
+        self.updated_visuals(evaluate(self.board))
+        self._stop_moving()
+
+    def pause(self):
+        self._is_paused = not self._is_paused
+        self.pause_ui.pause(self._is_paused)
+    
+    def replay(self):
+        self.window.show_view(OnlineGameView(self.player_id, self.type))

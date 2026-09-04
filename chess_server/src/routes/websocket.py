@@ -1,0 +1,202 @@
+import json
+import random
+import asyncio
+from fastapi import WebSocket, WebSocketDisconnect
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.core.queue import matchmaking_queue
+from src.core.game_manager import game_manager
+from src.controller.games_controller import GamesController
+from src.controller.user_controller import UserController
+from chess_core.enum.color_enum import Color
+from chess_core.enum.game_type import GameType
+from chess_core.enum.pieces_enum import Pieces
+
+active_connections: dict[int, dict[int, WebSocket]] = {}
+
+
+async def send(ws: WebSocket, data: dict):
+    await ws.send_text(json.dumps(data))
+
+
+async def broadcast(game_id: int, data: dict, exclude_player: int = None):
+    for player_id, ws in active_connections.get(game_id, {}).items():
+        if player_id != exclude_player:
+            await send(ws, data)
+
+
+async def handle_player(websocket: WebSocket, player_id: int, opponent_id: int, game_id: int, db: AsyncSession):
+    """Handles the game loop for a single player."""
+    MOVE_TIMEOUT = 60.0
+
+    try:
+        while True:
+            try:
+                raw = await asyncio.wait_for(
+                    websocket.receive_text(),
+                    timeout=MOVE_TIMEOUT
+                )
+            except asyncio.TimeoutError:
+                await ending_match(db, game_id, opponent_id, player_id, "timeout")
+                return
+
+            data = json.loads(raw)
+
+            if data["type"] == "move":
+                from_pos = tuple(data["from"])
+                to_pos = tuple(data["to"])
+
+                result = await GamesController.add_move(db, game_id, from_pos, to_pos, player_id)
+
+                if not result["success"]:
+                    await send(websocket, {"type": "invalid_move", "reason": result["reason"]})
+                    continue
+
+                await broadcast(game_id, {
+                    "type": "move",
+                    "from": from_pos,
+                    "to": to_pos
+                }, exclude_player=player_id)
+
+                if result["status"] == "promotion":
+                    await send(websocket, {"type": "pawn_promotion"})
+
+                if result["status"] in ("checkmate", "stalemate"):
+                    loser_id = opponent_id if player_id == result.get(
+                        "winner_id") else player_id
+                    await ending_match(db, game_id, result.get("winner_id"), loser_id, result["status"])
+
+                    return
+
+            elif data["type"] == "resign":
+                await ending_match(db, game_id, opponent_id, player_id, "resign")
+                return
+
+            elif data["type"] == "promotion":
+                type = Pieces(data.get("piece_type"))
+                result = await GamesController.promote(game_id, type)
+
+                if not result["success"]:
+                    await send(websocket, {"type": "error", "reason": result["reason"]})
+                    continue
+
+                await broadcast(game_id, {
+                    "type": "opponent_promotion",
+                    "piece_type": type
+                }, exclude_player=player_id)
+                
+                if result["status"] in ("checkmate", "stalemate"):
+                    loser_id = opponent_id if player_id == result.get("winner_id") else player_id
+                    await ending_match(db, game_id, result.get("winner_id"), loser_id, result["status"])
+                    return
+
+    except WebSocketDisconnect:
+        await ending_match(db, game_id, opponent_id, player_id, "resign", "opponent_disconnected")
+
+
+async def game_socket(websocket: WebSocket, player_id: int, type_game: GameType, db: AsyncSession):
+    await websocket.accept()
+
+    opponent = await matchmaking_queue.join(player_id, type_game, websocket)
+    is_second = False
+
+    if opponent is None:
+        await send(websocket, {"type": "waiting"})
+
+        try:
+            while True:
+                raw = await websocket.receive_text()
+                data = json.loads(raw)
+
+                if data.get("type") == "cancel":
+                    await matchmaking_queue.leave(player_id)
+                    await send(websocket, {"type": "cancelled"})
+                    return
+        except asyncio.CancelledError:
+            is_second = True
+        except WebSocketDisconnect:
+            await matchmaking_queue.leave(player_id)
+            return
+
+    if is_second:
+        _opponent = matchmaking_queue.get_opponent(player_id)
+        if _opponent is None:
+            return
+
+        opponent_id, _ = _opponent
+        game_id = await matchmaking_queue.wait_for_game(player_id)
+        if game_id is None:
+            return
+
+        await handle_player(websocket, player_id, opponent_id, game_id, db)
+        return
+
+    opponent_id, opponent_ws = opponent
+
+    if random.random() > 0.5:
+        white_id, black_id = player_id, opponent_id
+        white_ws, black_ws = websocket, opponent_ws
+    else:
+        white_id, black_id = opponent_id, player_id
+        white_ws, black_ws = opponent_ws, websocket
+
+    game = await GamesController.create(db, white_id, black_id, type_game)
+    game_id = game.id
+
+    active_connections[game_id] = {
+        white_id: white_ws,
+        black_id: black_ws,
+    }
+
+    matchmaking_queue.set_game_id(opponent_id, game_id)
+
+    print(player_id)
+    await send(white_ws, {
+        "type": "match_found",
+        "game_id": game_id,
+        "color": Color.WHITE,
+        "opponent_id": black_id,
+    })
+    await send(black_ws, {
+        "type": "match_found",
+        "game_id": game_id,
+        "color": Color.BLACK,
+        "opponent_id": white_id,
+    })
+
+    await handle_player(websocket, player_id, opponent_id, game_id, db)
+
+
+async def ending_match(
+    db: AsyncSession,
+    game_id: int,
+    winner_id: int,
+    loser_id: int,
+    status: str,
+    type: str = "game_over"
+):
+    game = game_manager.get_session(game_id)
+    if not game:
+        return
+
+    await broadcast(game_id, {
+        "type": type,
+        "status": status,
+        "winner_id": winner_id
+    })
+
+    if status in ["checkmate", "resign", "timeout"] and not game.is_casual_match():
+        await UserController.update_elo(
+            db,
+            winner_id,
+            10
+        )
+
+        await UserController.update_elo(
+            db,
+            loser_id,
+            -10
+        )
+
+    await GamesController.end(db, game_id, winner_id=winner_id)
+
+    active_connections.pop(game_id, None)
